@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -19,4 +20,11 @@ public class RoadmapPageEntity {
 
     @Column(nullable = false)
     private String text;
+
+    @ManyToOne
+    @JoinColumn(name = "roadmap_island_id", nullable = false)
+    private RoadmapIslandEntity island;
+
+    @OneToMany(mappedBy = "roadmapPage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SelectableOptionEntity> options;
 }

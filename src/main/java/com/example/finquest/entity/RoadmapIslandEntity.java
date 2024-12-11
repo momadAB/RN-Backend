@@ -23,6 +23,6 @@ public class RoadmapIslandEntity {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "roadmap", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "island", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoadmapPageEntity> pages;
 }

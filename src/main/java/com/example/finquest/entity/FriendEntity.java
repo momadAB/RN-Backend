@@ -11,6 +11,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "friend_entity", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"child_user_id", "nickname"})
+})
 public class FriendEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

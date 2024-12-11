@@ -18,12 +18,16 @@ public class AchievementEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String logoUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String description;
 
     @Column(nullable = false)
     private Boolean isCompleted;
+
+    @ManyToOne
+    @JoinColumn(name = "child_user_id", nullable = false)
+    private ChildUserEntity childUser;
 }

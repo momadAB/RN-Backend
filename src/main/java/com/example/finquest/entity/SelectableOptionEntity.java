@@ -23,6 +23,10 @@ public class SelectableOptionEntity {
 //    @Column(nullable = false)
 //    private AnswerCategory answerCategory;
 
+    @ManyToOne
+    @JoinColumn(name = "roadmap_page_id", nullable = false)
+    private RoadmapPageEntity roadmapPage;
+
     @Column(nullable = false)
     private String notificationText;
 }

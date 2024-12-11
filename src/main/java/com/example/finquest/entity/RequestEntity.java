@@ -23,9 +23,9 @@ public class RequestEntity {
     @Column(nullable = false)
     private String description;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private TransactionType transactionType;
+    @ManyToOne
+    @JoinColumn(name = "child_user_id", nullable = false)
+    private ChildUserEntity childUser;
 
     @Column(nullable = false)
     private Double amount;

@@ -1,5 +1,6 @@
 package com.example.finquest.entity;
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class ParentUserEntity {
@@ -15,6 +16,9 @@ public class ParentUserEntity {
 
     @Column(nullable = false)
     private String roles; // e.g., "user", "admin"
+
+    @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChildUserEntity> childUsers;
 
     // Getters and setters
     public Long getId() { return id; }
