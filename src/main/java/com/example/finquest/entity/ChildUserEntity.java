@@ -40,22 +40,44 @@ public class ChildUserEntity {
     @JoinColumn(name = "parent_user_id", nullable = false)
     private ParentUserEntity parentUser;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "completed_steps", joinColumns = @JoinColumn(name = "child_user_id"))
-    @Column(name = "step_id")
-    private List<Long> completedStepsOfRoadmap;
-
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RequestEntity> madeRequests;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AchievementEntity> achievements;
 
+    @ManyToMany
+    @JoinTable(
+            name = "child_user_friends",
+            joinColumns = @JoinColumn(name = "child_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private List<ChildUserEntity> friendsList;
+
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<FriendEntity> friends;
+    private List<OwnedStockEntity> ownedStocks;
+
+    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<LessonProgressEntity> progressEntities;
 
     @Column(nullable = false)
     private boolean isAllowedToMakeTransactionsWithNoPermission;
+
+    public List<OwnedStockEntity> getOwnedStocks() {
+        return ownedStocks;
+    }
+
+    public void setOwnedStocks(List<OwnedStockEntity> ownedStocks) {
+        this.ownedStocks = ownedStocks;
+    }
+
+    public List<LessonProgressEntity> getProgressEntities() {
+        return progressEntities;
+    }
+
+    public void setProgressEntities(List<LessonProgressEntity> progressEntities) {
+        this.progressEntities = progressEntities;
+    }
 
     public Long getId() {
         return id;
@@ -121,14 +143,6 @@ public class ChildUserEntity {
         this.parentUser = parentUser;
     }
 
-    public List<Long> getCompletedStepsOfRoadmap() {
-        return completedStepsOfRoadmap;
-    }
-
-    public void setCompletedStepsOfRoadmap(List<Long> completedStepsOfRoadmap) {
-        this.completedStepsOfRoadmap = completedStepsOfRoadmap;
-    }
-
     public List<RequestEntity> getMadeRequests() {
         return madeRequests;
     }
@@ -145,12 +159,12 @@ public class ChildUserEntity {
         this.achievements = achievements;
     }
 
-    public List<FriendEntity> getFriends() {
-        return friends;
+    public List<ChildUserEntity> getFriendsList() {
+        return friendsList;
     }
 
-    public void setFriends(List<FriendEntity> friends) {
-        this.friends = friends;
+    public void setFriendsList(List<ChildUserEntity> friendsList) {
+        this.friendsList = friendsList;
     }
 
     public boolean isAllowedToMakeTransactionsWithNoPermission() {
