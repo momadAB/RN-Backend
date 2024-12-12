@@ -23,7 +23,7 @@ public class ChildUserResponse {
     private List<Long> completedStepsOfRoadmap;
     private List<RequestEntity> madeRequests;
     private List<AchievementEntity> achievements;
-    private List<FriendEntity> friends;
+//    private List<FriendEntity> friends;
     private boolean isAllowedToMakeTransactionsWithNoPermission;
 
     public ChildUserResponse(ChildUserEntity childUserEntity) {
