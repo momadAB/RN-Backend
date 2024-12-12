@@ -3,8 +3,10 @@ import com.example.finquest.entity.ChildUserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public interface ChildUserRepository extends JpaRepository<ChildUserEntity, Long> {
-    ChildUserEntity findByName(String username);
+    Optional<ChildUserEntity> findByName(String username);
 }

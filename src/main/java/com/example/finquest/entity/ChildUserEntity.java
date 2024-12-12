@@ -27,7 +27,7 @@ public class ChildUserEntity {
     @Column(nullable = false, length = 40)
     private String name;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 200)
     private String password;
 
     @Column(nullable = false)
@@ -45,13 +45,13 @@ public class ChildUserEntity {
     @Column(name = "step_id")
     private List<Long> completedStepsOfRoadmap;
 
-    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RequestEntity> madeRequests;
 
-    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AchievementEntity> achievements;
 
-    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FriendEntity> friends;
 
     @Column(nullable = false)

@@ -32,7 +32,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // 2. Try to load ChildUser
-        ChildUserEntity childUser = childUserRepository.findByName(username);
+        ChildUserEntity childUser = childUserRepository.findByName(username).orElse(null);
+
         if (childUser != null) {
             return new CustomUserDetails(childUser.getId(), childUser.getName(), childUser.getPassword(), childUser.getRoles(), true // Assuming all users are enabled by default
             );
