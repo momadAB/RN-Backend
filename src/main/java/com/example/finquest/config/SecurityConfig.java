@@ -21,8 +21,8 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String AUTH_PATH= "/api/v1/auth/**";
-    public static final String ADMIN_PATH="/api/v1/admin-dashboard/**";
-    public static final String USER_PATH = "/api/v1/user/**";
+    public static final String PARENT_PATH ="/api/v1/parent/**";
+    public static final String CHILD_PATH = "/api/v1/child/**";
 
     private static final List<String> ALLOWED_METHODS = Arrays.asList("GET", "PUT", "POST", "DELETE", "OPTIONS", "PATCH");
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("x-requested-with", "authorization", "Content-Type", "Authorization", "credential", "X-XSRF-TOKEN", "X-Refresh-Token", "X-Client-Id", "x-client-id");
@@ -43,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(AUTH_PATH).permitAll()
-                .antMatchers(USER_PATH).hasAuthority("user")
-                .antMatchers(ADMIN_PATH).hasAuthority("admin")
+                .antMatchers(CHILD_PATH).hasAuthority("ROLE_CHILD")
+                .antMatchers(PARENT_PATH).hasAuthority("ROLE_PARENT")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);

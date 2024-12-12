@@ -1,10 +1,10 @@
 package com.example.finquest.bo;
 
-public class RegisterUserRequest {
+public class RegisterParentUserRequest {
 
     private String username;
     private String password;
-    private String roles;
+    private String roles = "ROLE_PARENT";
 
     public String getUsername() {
         return username;

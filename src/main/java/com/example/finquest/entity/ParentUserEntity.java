@@ -1,13 +1,16 @@
 package com.example.finquest.entity;
+
 import javax.persistence.*;
 import java.util.List;
-import lombok.AllArgsConstructor;
+
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-
-@Data
+@Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,10 +27,44 @@ public class ParentUserEntity {
     private String password;
 
     @Column(nullable = false)
-    private String roles; // e.g., "user", "admin"
+    private String roles = "ROLE_PARENT";
 
     @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChildUserEntity> childUsers;
+    private List<ChildUserEntity> children;
 
+    public Long getId() {
+        return id;
+    }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
+    }
+
+    public List<ChildUserEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ChildUserEntity> children) {
+        this.children = children;
+    }
 }

@@ -16,13 +16,17 @@ public class JWTUtil {
     private final String jwtSignKey = "secret";
 
     /**
-     * Generates a JWT token using the provided username and additional claims.
+     * Generates a JWT token using the provided username, roles, and additional claims.
      *
      * @param username The username for which the token is being generated.
+     * @param roles The roles assigned to the user (PARENT_USER or CHILD_USER).
+//     * @param userType The type of the user (ParentUser or ChildUser).
      * @param claims Optional additional claims to be included in the token.
      * @return The generated JWT token.
      */
-    public String generateToken(String username, Map<String, Object> claims) {
+    public String generateToken(String username, String roles, Map<String, Object> claims) {
+        claims.put("roles", roles);
+//        claims.put("userType", userType); // Helps distinguish between Parent and Child users
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -31,7 +35,6 @@ public class JWTUtil {
                 .signWith(SignatureAlgorithm.HS256, jwtSignKey)
                 .compact();
     }
-
 
     /**
      * Extracts specific claim from the token using a custom claims resolver.
@@ -105,9 +108,19 @@ public class JWTUtil {
      * Extracts roles (if any) from the JWT token.
      *
      * @param token The JWT token.
-     * @return The roles present in the token as a list.
+     * @return The roles present in the token as a string.
      */
     public String getRolesFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("roles", String.class));
     }
+
+    /**
+     * Extracts userType (if any) from the JWT token to distinguish if it's a ParentUser or ChildUser.
+     *
+     * @param token The JWT token.
+     * @return The userType present in the token as a string (e.g., "PARENT_USER" or "CHILD_USER").
+     */
+//    public String getUserTypeFromToken(String token) {
+//        return getClaimFromToken(token, claims -> claims.get("userType", String.class));
+//    }
 }
