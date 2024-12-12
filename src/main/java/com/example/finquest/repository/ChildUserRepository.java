@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChildUserRepository extends JpaRepository<ChildUserEntity, Long> {
+    ChildUserEntity findByName(String username);
 }

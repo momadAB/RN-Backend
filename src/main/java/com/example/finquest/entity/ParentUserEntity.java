@@ -15,21 +15,48 @@ public class ParentUserEntity {
     private String password;
 
     @Column(nullable = false)
-    private String roles; // e.g., "user", "admin"
+    private String roles = "ROLE_PARENT";
 
     @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChildUserEntity> childUsers;
 
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getRoles() { return roles; }
-    public void setRoles(String roles) { this.roles = roles; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
+    }
+
+    public List<ChildUserEntity> getChildUsers() {
+        return childUsers;
+    }
+
+    public void setChildUsers(List<ChildUserEntity> childUsers) {
+        this.childUsers = childUsers;
+    }
 }

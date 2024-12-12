@@ -1,6 +1,6 @@
 package com.example.finquest.controller;
 
-import com.example.finquest.bo.RegisterUserRequest;
+import com.example.finquest.bo.RegisterParentUserRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ParentUserEntity;
 import com.example.finquest.repository.ParentUserRepository;
@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,12 +42,12 @@ public class PublicController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<String> register(@RequestBody RegisterParentUserRequest request) {
         try {
             ParentUserEntity parent = new ParentUserEntity();
             parent.setUsername(request.getUsername());
             parent.setPassword(passwordEncoder.encode(request.getPassword()));
-            parent.setRoles("user");
+            parent.setRoles(request.getRoles());
             parentUserRepository.save(parent);
             return ResponseEntity.ok().body("User registered successfully!");
         } catch (Exception e) {
@@ -71,7 +69,7 @@ public class PublicController {
             Map<String, Object> claims = new HashMap<>();
             claims.put("roles", existingUser.getRoles());
 
-            String token = jwtUtil.generateToken(existingUser.getUsername(), claims);
+            String token = jwtUtil.generateToken(existingUser.getUsername(), existingUser.getRoles(), claims);
 
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
