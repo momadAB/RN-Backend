@@ -6,13 +6,18 @@ import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.entity.ParentUserEntity;
 import com.example.finquest.repository.ChildUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ChildUserService {
 
     private final ChildUserRepository childUserRepository;
+
+    @Autowired
+    public ChildUserService(ChildUserRepository childUserRepository) {
+        this.childUserRepository = childUserRepository;
+    }
 
     public ChildUserResponse getChildUserById(Long id) {
         ChildUserEntity childUserEntity = childUserRepository.findById(id)

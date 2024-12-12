@@ -7,10 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ParentUserService {
 
     private final ParentUserRepository parentUserRepository;
+
+    public ParentUserService (ParentUserRepository parentUserRepository) {
+        this.parentUserRepository = parentUserRepository;
+    }
 
     public ParentUserResponse getParentUserById(Long id) {
         ParentUserEntity parentUserEntity = parentUserRepository.findById(id)
