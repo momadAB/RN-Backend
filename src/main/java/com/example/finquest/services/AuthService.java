@@ -38,55 +38,61 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<String> registerParentUser(RegisterParentUserRequest request) {
+    public ResponseEntity<Map<String, String>> registerParentUser(RegisterParentUserRequest request) {
         try {
             validateParentInput(request);
+
+            // Check if parent already exists
+            if (parentUserRepository.findByUsername(request.getUsername()).isPresent()) {
+                throw new IllegalArgumentException("Parent user already exists");
+            }
+
             ParentUserEntity parent = new ParentUserEntity();
             parent.setUsername(request.getUsername());
             parent.setPassword(passwordEncoder.encode(request.getPassword()));
             parent.setRoles(request.getRoles());
             parentUserRepository.save(parent);
-            return ResponseEntity.ok().body("User registered successfully!");
+            return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
 
-    public String registerChild(RegisterChildUserRequest request, String token) {
-        validateChildInput(request);
-
-        String username = extractUsernameFromToken(token);
-        ParentUserEntity parent = getParentByUsername(username);
-
-        ensureChildNameIsUnique(parent, request.getName());
-
-        ChildUserEntity child = createChildUser(request, parent);
-        childUserRepository.save(child);
-
-        parent.getChildren().add(child);
-        parentUserRepository.save(parent);
-
-        return "Child registered successfully!";
+    public ResponseEntity<Map<String, String>> registerChildUser(RegisterChildUserRequest request, String token) {
+        try {
+            validateChildInput(request);
+            String username = extractUsernameFromToken(token);
+            ParentUserEntity parent = getParentByUsername(username);
+            // Check that child does not already exist
+            ensureChildNameIsUnique(parent, request.getName());
+            ChildUserEntity child = createChildUser(request, parent);
+            childUserRepository.save(child);
+            parent.getChildren().add(child);
+            parentUserRepository.save(parent);
+            return ResponseEntity.ok(Map.of("message", "Child registered successfully!"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
     }
 
     public ResponseEntity<Map<String, String>> loginChildUser(ChildUserEntity childUser) {
         try {
+            validateLoginInput(childUser.getName(), childUser.getPassword());
             ChildUserEntity existingChildUser = childUserRepository.findByName(childUser.getName())
                     .orElseThrow(() -> new RuntimeException("Child user not found"));
-
             if (!passwordEncoder.matches(childUser.getPassword(), existingChildUser.getPassword())) {
                 throw new RuntimeException("Invalid password");
             }
-
             Map<String, Object> claims = new HashMap<>();
             claims.put("roles", existingChildUser.getRoles());
-
             String token = jwtUtil.generateToken(existingChildUser.getName(), existingChildUser.getRoles(), claims);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            return ResponseEntity.ok(response);
-
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
@@ -94,22 +100,18 @@ public class AuthService {
 
     public ResponseEntity<Map<String, String>> loginParentUser(ParentUserEntity parentUser) {
         try {
+            validateLoginInput(parentUser.getUsername(), parentUser.getPassword());
             ParentUserEntity existingUser = parentUserRepository.findByUsername(parentUser.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-
             if (!passwordEncoder.matches(parentUser.getPassword(), existingUser.getPassword())) {
                 throw new RuntimeException("Invalid password");
             }
-
             Map<String, Object> claims = new HashMap<>();
             claims.put("roles", existingUser.getRoles());
-
             String token = jwtUtil.generateToken(existingUser.getUsername(), existingUser.getRoles(), claims);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            return ResponseEntity.ok(response);
-
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
@@ -132,6 +134,15 @@ public class AuthService {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
         if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+    }
+
+    private void validateLoginInput(String username, String password) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
     }

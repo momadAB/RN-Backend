@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/parent")
 public class ParentUserController {
@@ -23,14 +25,7 @@ public class ParentUserController {
     }
 
     @PostMapping("/register-child")
-    public ResponseEntity<String> registerChild(@RequestBody RegisterChildUserRequest request, @RequestHeader("Authorization") String token) {
-        try {
-            String message = authService.registerChild(request, token);
-            return ResponseEntity.ok().body(message);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("An unexpected error occurred: " + e.getMessage());
-        }
+    public ResponseEntity<Map<String, String>> registerChild(@RequestBody RegisterChildUserRequest request, @RequestHeader("Authorization") String token) {
+        return authService.registerChildUser(request, token);
     }
 }

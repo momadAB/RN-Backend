@@ -27,7 +27,7 @@ public class PublicController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterParentUserRequest request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterParentUserRequest request) {
         return authService.registerParentUser(request);
     }
 
