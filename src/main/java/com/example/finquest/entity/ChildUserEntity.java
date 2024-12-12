@@ -19,7 +19,7 @@ public class ChildUserEntity {
     private Long id;
 
     @Column(nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO;
+    private Double balance = 0.0;
 
     @Column(nullable = false)
     private Long achievementPoints = 0L;
@@ -65,11 +65,11 @@ public class ChildUserEntity {
         this.id = id;
     }
 
-    public BigDecimal getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
