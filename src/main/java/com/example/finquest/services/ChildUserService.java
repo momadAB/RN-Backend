@@ -1,13 +1,14 @@
 package com.example.finquest.services;
 
 import com.example.finquest.bo.ChildUserResponse;
-import com.example.finquest.bo.ParentUserResponse;
 import com.example.finquest.entity.ChildUserEntity;
-import com.example.finquest.entity.ParentUserEntity;
 import com.example.finquest.repository.ChildUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class ChildUserService {
@@ -20,11 +21,8 @@ public class ChildUserService {
     }
 
     public ChildUserResponse getChildUserById(Long id) {
-        ChildUserEntity childUserEntity = childUserRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Child with ID " + id + " not found"));
+        ChildUserEntity childUserEntity = childUserRepository.findById(id).orElseThrow(() -> new RuntimeException("Child with ID " + id + " not found"));
         ChildUserResponse childUserResponse = new ChildUserResponse(childUserEntity);
         return childUserResponse;
     }
-
-
 }

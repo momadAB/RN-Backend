@@ -124,7 +124,7 @@ public class AuthService {
     }
 
 
-    private void validateChildInput(RegisterChildUserRequest request) {
+    protected void validateChildInput(RegisterChildUserRequest request) {
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
@@ -136,7 +136,7 @@ public class AuthService {
         }
     }
 
-    private void validateParentInput(RegisterParentUserRequest request) {
+    protected void validateParentInput(RegisterParentUserRequest request) {
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
@@ -145,7 +145,7 @@ public class AuthService {
         }
     }
 
-    private void validateLoginInput(String username, String password) {
+    protected void validateLoginInput(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
@@ -154,7 +154,7 @@ public class AuthService {
         }
     }
 
-    private String extractUsernameFromToken(String token) {
+    protected String extractUsernameFromToken(String token) {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
