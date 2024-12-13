@@ -35,6 +35,6 @@ public class ParentUserController {
 
     @PostMapping("/make-transaction")
     public ResponseEntity<Map<String, String>> addBalanceToChild(@RequestBody ChildTransactionRequest request, @RequestHeader("Authorization") String token) {
-        return parentUserService.addBalanceToChild(request, token);
+        return parentUserService.makeTransactionForChild(request, token);
     }
 }

@@ -7,7 +7,6 @@ import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.entity.ParentUserEntity;
 import com.example.finquest.repository.ChildUserRepository;
 import com.example.finquest.repository.ParentUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,10 +35,14 @@ public class ParentUserService {
         return responseId;
     }
 
-    public ResponseEntity<Map<String, String>> addBalanceToChild(ChildTransactionRequest request, String token) {
+    public ResponseEntity<Map<String, String>> makeTransactionForChild(ChildTransactionRequest request, String token) {
         try {
             String childName = request.getChildName();
             Double amount = request.getAmount();
+            // Check that amount is not null
+            if (amount == null || childName == null) {
+                throw new IllegalArgumentException("Amount and child name cannot be null");
+            }
             // Check token
             String username = jwtUtil.getUsernameFromToken(token);
             Optional<ParentUserEntity> parent = parentUserRepository.findByUsername(username);
