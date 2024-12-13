@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ChildUserRepository extends JpaRepository<ChildUserEntity, Long> {
-    Optional<ChildUserEntity> findByName(String username);
+    Optional<ChildUserEntity> findByUsername(String username);
 }

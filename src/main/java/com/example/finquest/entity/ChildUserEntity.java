@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -25,7 +24,7 @@ public class ChildUserEntity {
     private Long achievementPoints = 0L;
 
     @Column(nullable = false, length = 40)
-    private String name;
+    private String username;
 
     @Column(nullable = false, length = 200)
     private String password;
@@ -103,12 +102,12 @@ public class ChildUserEntity {
         this.achievementPoints = achievementPoints;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
