@@ -91,9 +91,11 @@ public class ChildUserService {
 
                 // Return response
                 Map<String, String> response = new HashMap<>();
-                response.put("message", "Stock updated successfully");
-                response.put("new balance", String.valueOf(childUserEntity.getBalance()));
-                response.put("stock", ownedStockEntity.toString());
+                response.put("message", "Stock added successfully");
+                response.put("newBalance", String.valueOf(childUserEntity.getBalance()));
+                response.put("childUsername", childUserEntity.getUsername());
+                response.put("companyName", ownedStockEntity.getStock().getCompanyName());
+                response.put("stockAmount", String.valueOf(ownedStockEntity.getAmount()));
                 return ResponseEntity.ok(response);
             } else {
                 // If stock is not owned, create a new stock entry
@@ -119,8 +121,10 @@ public class ChildUserService {
                 // Return response
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Stock added successfully");
-                response.put("new balance", String.valueOf(childUserEntity.getBalance()));
-                response.put("stock", ownedStockEntity.toString());
+                response.put("newBalance", String.valueOf(childUserEntity.getBalance()));
+                response.put("childUsername", childUserEntity.getUsername());
+                response.put("companyName", ownedStockEntity.getStock().getCompanyName());
+                response.put("stockAmount", String.valueOf(ownedStockEntity.getAmount()));
                 return ResponseEntity.ok(response);
             }
         } catch (IllegalArgumentException e) {
