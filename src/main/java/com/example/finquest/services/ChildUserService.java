@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ChildUserService {
@@ -22,6 +23,7 @@ public class ChildUserService {
     private final ChildUserRepository childUserRepository;
     private final OwnedStockRepository ownedStockRepository;
     private final AchievementProgressRepository achievementProgressRepository;
+    private final LessonProgressRepository lessonProgressRepository;;
     private final RoadmapIslandRepository roadmapIslandRepository;
     private final RoadmapLessonRepository roadmapLessonRepository;
     private final StockRepository stockRepository;
@@ -31,6 +33,7 @@ public class ChildUserService {
     public ChildUserService(ChildUserRepository childUserRepository,
                             OwnedStockRepository ownedStockRepository,
                             AchievementProgressRepository achievementProgressRepository,
+                            LessonProgressRepository lessonProgressRepository,
                             RoadmapIslandRepository roadmapIslandRepository,
                             RoadmapLessonRepository roadmapLessonRepository,
                             StockRepository stockRepository,
@@ -38,6 +41,7 @@ public class ChildUserService {
         this.childUserRepository = childUserRepository;
         this.ownedStockRepository = ownedStockRepository;
         this.achievementProgressRepository = achievementProgressRepository;
+        this.lessonProgressRepository = lessonProgressRepository;
         this.roadmapIslandRepository = roadmapIslandRepository;
         this.roadmapLessonRepository = roadmapLessonRepository;
         this.stockRepository = stockRepository;
@@ -152,7 +156,7 @@ public class ChildUserService {
                 achievementData.put("id", achievementEntity.getId());
                 achievementData.put("isCompleted", progressEntity.getIsCompleted());
                 return achievementData;
-            }).toList();
+            }).collect(Collectors.toList());
 
             response.put("achievements", achievements);
 
@@ -163,10 +167,37 @@ public class ChildUserService {
                 islandMap.put("id", island.getId());
                 islandMap.put("title", island.getTitle());
                 islandMap.put("logoUrl", island.getLogoUrl());
-                return islandMap;
-            }).toList();
 
-            // TODO: Get progress for each island
+                // Get lessons for this island
+                List<Map<String, Object>> lessons = island.getLessons().stream().map(lesson -> {
+                    Map<String, Object> lessonMap = new HashMap<>();
+                    lessonMap.put("id", lesson.getId());
+                    lessonMap.put("title", lesson.getTitle());
+                    lessonMap.put("description", lesson.getDescription());
+
+                    // Get pages for this lesson
+                    List<RoadmapPageEntity> pages = lesson.getPages();
+                    int totalPages = pages.size();
+
+                    // Calculate completed pages for this lesson
+                    long completedPagesCount = pages.stream().filter(page -> {
+                        return lessonProgressRepository.findByChildUserAndRoadmapPage(childUserEntity, page)
+                                .map(progressEntity -> (LessonProgressEntity) progressEntity)
+                                .map(LessonProgressEntity::getCompleted)
+                                .orElse(false);
+                    }).count();
+
+                    double completionPercentage = totalPages > 0 ? ((double) completedPagesCount / totalPages) * 100 : 0;
+
+                    lessonMap.put("totalPages", totalPages);
+                    lessonMap.put("completedPages", completedPagesCount);
+                    lessonMap.put("completionPercentage", completionPercentage);
+                    return lessonMap;
+                }).collect(Collectors.toList());
+
+                islandMap.put("lessons", lessons);
+                return islandMap;
+            }).collect(Collectors.toList());
 
             response.put("islands", islandData);
 
@@ -177,7 +208,6 @@ public class ChildUserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
-
     @Transactional
     public ResponseEntity<Map<String, Object>> getLessons(String token, Long islandId) {
         try {

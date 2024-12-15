@@ -24,6 +24,9 @@ public class RoadmapLessonEntity {
     @Column(nullable = false)
     private String title;
 
+    @Column
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "roadmap_island_id", nullable = false)
     @JsonBackReference
@@ -39,6 +42,14 @@ public class RoadmapLessonEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getTitle() {
