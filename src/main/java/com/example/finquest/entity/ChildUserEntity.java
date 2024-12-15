@@ -1,4 +1,5 @@
 package com.example.finquest.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +38,7 @@ public class ChildUserEntity {
 
     @ManyToOne
     @JoinColumn(name = "parent_user_id", nullable = false)
+    @JsonBackReference
     private ParentUserEntity parentUser;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

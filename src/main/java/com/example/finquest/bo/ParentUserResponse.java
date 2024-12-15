@@ -18,9 +18,13 @@ public class ParentUserResponse {
     private String username;
     private String password;
     private String roles = "ROLE_PARENT";
-    private List<ChildUserEntity> children;
+//    private List<ChildUserEntity> children;
 
 
     public ParentUserResponse(ParentUserEntity parentUserEntity) {
+        this.id = parentUserEntity.getId();
+        this.username = parentUserEntity.getUsername();
+        this.roles = parentUserEntity.getRoles();
+//        this.children = parentUserEntity.getChildren();
     }
 }

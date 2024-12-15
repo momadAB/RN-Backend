@@ -28,11 +28,13 @@ public class ParentUserService {
         this.jwtUtil = jwtUtil;
     }
 
-    public ParentUserResponse getParentUserById(Long id) {
-        ParentUserEntity parentUserEntity = parentUserRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Parent with ID " + id + " not found"));
-        ParentUserResponse responseId = new ParentUserResponse(parentUserEntity);
-        return responseId;
+    public ParentUserResponse getParentUser(String token) {
+        String username = jwtUtil.getUsernameFromToken(token);
+
+        ParentUserEntity parentUserEntity = parentUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Parent with name " + username + " not found"));
+
+        return new ParentUserResponse(parentUserEntity);
     }
 
     public ResponseEntity<Map<String, String>> makeTransactionForChild(ChildTransactionRequest request, String token) {

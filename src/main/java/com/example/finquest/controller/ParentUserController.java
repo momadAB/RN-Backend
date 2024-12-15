@@ -1,6 +1,7 @@
 package com.example.finquest.controller;
 
 import com.example.finquest.bo.ChildTransactionRequest;
+import com.example.finquest.bo.ParentUserResponse;
 import com.example.finquest.bo.RegisterChildUserRequest;
 import com.example.finquest.services.AuthService;
 import com.example.finquest.services.ParentUserService;
@@ -37,4 +38,14 @@ public class ParentUserController {
     public ResponseEntity<Map<String, String>> addBalanceToChild(@RequestBody ChildTransactionRequest request, @RequestHeader("Authorization") String token) {
         return parentUserService.makeTransactionForChild(request, token);
     }
+
+    @GetMapping("/get-parent")
+    public ParentUserResponse getParentUser(@RequestHeader("Authorization") String token) {
+        System.out.println(token);
+        System.out.println(parentUserService.getParentUser(token));
+        return parentUserService.getParentUser(token);
+    }
+
+
+
 }
