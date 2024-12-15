@@ -19,10 +19,6 @@ public class SelectableOptionEntity {
     @Column(nullable = false)
     private String text;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private AnswerCategory answerCategory;
-
     @ManyToOne
     @JoinColumn(name = "roadmap_page_id", nullable = false)
     private RoadmapPageEntity roadmapPage;

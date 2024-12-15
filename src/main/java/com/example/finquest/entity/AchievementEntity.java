@@ -19,6 +19,9 @@ public class AchievementEntity {
     private Long id;
 
     @Column(nullable = false, length = 255)
+    private String title;
+
+    @Column(nullable = false, length = 255)
     private String logoUrl;
 
     @Column(nullable = false, length = 500)

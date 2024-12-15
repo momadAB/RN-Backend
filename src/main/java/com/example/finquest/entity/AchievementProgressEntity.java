@@ -25,5 +25,27 @@ public class AchievementProgressEntity {
     @JoinColumn(name = "achievement_id", nullable = false)
     private AchievementEntity achievement;
 
+    public AchievementEntity getAchievement() {
+        return achievement;
+    }
 
+    public void setAchievement(AchievementEntity achievement) {
+        this.achievement = achievement;
+    }
+
+    public ChildUserEntity getChildUser() {
+        return childUser;
+    }
+
+    public void setChildUser(ChildUserEntity childUser) {
+        this.childUser = childUser;
+    }
+
+    public Boolean getIsCompleted() {
+        return isCompleted;
+    }
+
+    public void setIsCompleted(Boolean completed) {
+        isCompleted = completed;
+    }
 }
