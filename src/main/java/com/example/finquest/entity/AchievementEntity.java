@@ -23,11 +23,4 @@ public class AchievementEntity {
 
     @Column(nullable = false, length = 500)
     private String description;
-
-    @Column(nullable = false)
-    private Boolean isCompleted;
-
-    @ManyToOne
-    @JoinColumn(name = "child_user_id", nullable = false)
-    private ChildUserEntity childUser;
 }

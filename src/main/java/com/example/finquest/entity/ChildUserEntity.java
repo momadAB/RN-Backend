@@ -43,7 +43,7 @@ public class ChildUserEntity {
     private List<RequestEntity> madeRequests;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<AchievementEntity> achievements;
+    private List<AchievementProgressEntity> achievementProgress;
 
     @ManyToMany
     @JoinTable(
@@ -150,12 +150,12 @@ public class ChildUserEntity {
         this.madeRequests = madeRequests;
     }
 
-    public List<AchievementEntity> getAchievements() {
-        return achievements;
+    public List<AchievementProgressEntity> getAchievementProgress() {
+        return achievementProgress;
     }
 
-    public void setAchievements(List<AchievementEntity> achievements) {
-        this.achievements = achievements;
+    public void setAchievementProgress(List<AchievementProgressEntity> achievementProgress) {
+        this.achievementProgress = achievementProgress;
     }
 
     public List<ChildUserEntity> getFriendsList() {
