@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class RoadmapIslandEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,5 +25,5 @@ public class RoadmapIslandEntity {
     private String title;
 
     @OneToMany(mappedBy = "island", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoadmapPageEntity> pages;
+    private List<RoadmapLessonEntity> lessons;
 }

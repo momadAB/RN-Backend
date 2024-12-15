@@ -101,7 +101,12 @@ public class JWTUtil {
      * @return The username extracted from the token.
      */
     public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        // Check if bearer token
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        return getClaimFromToken(token, Claims::getSubject
+        );
     }
 
     /**

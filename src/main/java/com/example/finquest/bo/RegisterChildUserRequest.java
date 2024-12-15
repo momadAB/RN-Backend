@@ -1,7 +1,7 @@
 package com.example.finquest.bo;
 
 public class RegisterChildUserRequest {
-    private String name;
+    private String username;
     private String password;
     private Long avatarId;
     private String roles = "ROLE_CHILD";
@@ -22,12 +22,12 @@ public class RegisterChildUserRequest {
         this.avatarId = avatarId;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getRoles() {

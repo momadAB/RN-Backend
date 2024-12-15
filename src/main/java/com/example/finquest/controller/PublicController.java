@@ -1,5 +1,6 @@
 package com.example.finquest.controller;
 
+import com.example.finquest.bo.LoginRequest;
 import com.example.finquest.bo.RegisterParentUserRequest;
 import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.entity.ParentUserEntity;
@@ -30,14 +31,13 @@ public class PublicController {
     public ResponseEntity<Map<String, String>> register(@RequestBody RegisterParentUserRequest request) {
         return authService.registerParentUser(request);
     }
-
-    @PostMapping("/login-child")
-    public ResponseEntity<Map<String, String>> loginChild(@RequestBody ChildUserEntity childUser) {
-        return authService.loginChildUser(childUser);
-    }
+//    @PostMapping("/login-child")
+//    public ResponseEntity<Map<String, String>> loginChild(@RequestBody LoginRequest childUser) {
+//        return authService.loginUser(childUser);
+//    }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody ParentUserEntity parentUser) {
-        return authService.loginParentUser(parentUser);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest parentUser) {
+        return authService.loginUser(parentUser);
     }
 }

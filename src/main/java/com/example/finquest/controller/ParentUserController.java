@@ -1,7 +1,9 @@
 package com.example.finquest.controller;
 
+import com.example.finquest.bo.ChildTransactionRequest;
 import com.example.finquest.bo.RegisterChildUserRequest;
 import com.example.finquest.services.AuthService;
+import com.example.finquest.services.ParentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +15,12 @@ import java.util.Map;
 public class ParentUserController {
 
     private final AuthService authService;
+    private final ParentUserService parentUserService;
 
     @Autowired
-    public ParentUserController(AuthService authService) {
+    public ParentUserController(AuthService authService, ParentUserService parentUserService) {
         this.authService = authService;
+        this.parentUserService = parentUserService;
     }
 
     @GetMapping("/hello")
@@ -27,5 +31,10 @@ public class ParentUserController {
     @PostMapping("/register-child")
     public ResponseEntity<Map<String, String>> registerChild(@RequestBody RegisterChildUserRequest request, @RequestHeader("Authorization") String token) {
         return authService.registerChildUser(request, token);
+    }
+
+    @PostMapping("/make-transaction")
+    public ResponseEntity<Map<String, String>> addBalanceToChild(@RequestBody ChildTransactionRequest request, @RequestHeader("Authorization") String token) {
+        return parentUserService.makeTransactionForChild(request, token);
     }
 }

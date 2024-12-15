@@ -22,8 +22,8 @@ public class RoadmapPageEntity {
     private String text;
 
     @ManyToOne
-    @JoinColumn(name = "roadmap_island_id", nullable = false)
-    private RoadmapIslandEntity island;
+    @JoinColumn(name = "roadmap_lesson_id", nullable = false)
+    private RoadmapLessonEntity lesson;
 
     @OneToMany(mappedBy = "roadmapPage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SelectableOptionEntity> options;

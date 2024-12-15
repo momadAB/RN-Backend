@@ -1,4 +1,5 @@
 package com.example.finquest.entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +13,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class AchievementEntity {
+public class RoadmapLessonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
-    private String logoUrl;
+    @Column(nullable = false)
+    private String title;
 
-    @Column(nullable = false, length = 500)
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "roadmap_island_id", nullable = false)
+    private RoadmapIslandEntity island;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoadmapPageEntity> pages;
 }
+
