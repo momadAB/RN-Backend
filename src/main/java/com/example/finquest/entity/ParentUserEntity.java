@@ -3,6 +3,7 @@ package com.example.finquest.entity;
 import javax.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
@@ -29,7 +30,8 @@ public class ParentUserEntity {
     @Column(nullable = false)
     private String roles = "ROLE_PARENT";
 
-    @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<ChildUserEntity> children;
 
     public Long getId() {
