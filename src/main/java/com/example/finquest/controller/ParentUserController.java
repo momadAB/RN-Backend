@@ -45,6 +45,12 @@ public class ParentUserController {
         return ResponseEntity.ok(response);  // Automatically serialized to JSON
     }
 
+    @DeleteMapping("/remove-child/{childId}")
+    public ResponseEntity<Map<String, String>> removeChild(@PathVariable Long childId, @RequestHeader("Authorization") String token) {
+        return parentUserService.removeChildFromParent(childId, token);
+    }
+
+
 
 
 }

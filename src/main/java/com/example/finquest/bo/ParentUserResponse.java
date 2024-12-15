@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 
+import javax.persistence.JoinColumn;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,9 +21,11 @@ public class ParentUserResponse {
     private Long id;
     @JsonProperty("username")
     private String username;
+    @JsonProperty("roles")
     private String roles = "ROLE_PARENT";
 
     // Optional: Include children if you want to return them
+    @JsonProperty("children")
     private List<ChildUserResponse> children;
 
     public ParentUserResponse(ParentUserEntity parentUserEntity) {
@@ -30,10 +33,9 @@ public class ParentUserResponse {
         this.username = parentUserEntity.getUsername();
         this.roles = parentUserEntity.getRoles();
 
-        // If you want to include children, map them to ChildUserResponse (DTO)
         if (parentUserEntity.getChildren() != null) {
             this.children = parentUserEntity.getChildren().stream()
-                    .map(child -> new ChildUserResponse(child))  // Assuming you have a ChildUserResponse DTO
+                    .map(child -> new ChildUserResponse(child))
                     .collect(Collectors.toList());
         }
     }

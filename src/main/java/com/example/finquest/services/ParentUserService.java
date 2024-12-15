@@ -72,4 +72,33 @@ public class ParentUserService {
         }
     }
 
+    public ResponseEntity<Map<String, String>> removeChildFromParent(Long childId, String token) {
+        try {
+            String username = jwtUtil.getUsernameFromToken(token);
+            ParentUserEntity parentUser = parentUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Parent user not found"));
+
+            ChildUserEntity childUser = childUserRepository.findById(childId)
+                    .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+
+            if (!childUser.getParentUser().getId().equals(parentUser.getId())) {
+                throw new IllegalArgumentException("Child does not belong to the parent");
+            }
+
+            parentUser.getChildren().remove(childUser);
+            childUserRepository.delete(childUser);
+
+            parentUserRepository.save(parentUser);
+
+            Map<String, String> response = Map.of("message", "Child removed successfully");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An error occurred"));
+        }
+    }
+
+
+
 }
