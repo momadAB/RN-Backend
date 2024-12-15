@@ -30,12 +30,27 @@ public class ChildUserController {
     }
 
     @PostMapping("/stock-transaction")
-    public ResponseEntity<Map<String, String>> makeStockTransaction(@RequestBody StockTransactionRequest request, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> makeStockTransaction(@RequestBody StockTransactionRequest request, @RequestHeader("Authorization") String token) {
         return childUserService.makeStockTransaction(request, token);
     }
 
     @PostMapping("/complete-achievement/{achievementId}")
     public ResponseEntity<Map<String, String>> completeAchievement(@PathVariable Long achievementId, @RequestHeader("Authorization") String token) {
         return achievementService.updateAchievementProgress(achievementId, token);
+    }
+
+    @GetMapping("/get-progress")
+    public ResponseEntity<Map<String, Object>> getProgress(@RequestHeader("Authorization") String token) {
+        return childUserService.getProgress(token);
+    }
+
+    @GetMapping("/get-lessons/{islandId}")
+    public ResponseEntity<Map<String, Object>> getLessons(@RequestHeader("Authorization") String token, @PathVariable Long islandId) {
+        return childUserService.getLessons(token, islandId);
+    }
+
+    @GetMapping("/get-pages/{lessonId}")
+    public ResponseEntity<Map<String, Object>> getPages(@RequestHeader("Authorization") String token, @PathVariable Long lessonId) {
+        return childUserService.getPages(token, lessonId);
     }
 }
