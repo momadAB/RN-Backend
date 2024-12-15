@@ -30,9 +30,11 @@ public class ParentUserService {
 
     public ParentUserResponse getParentUser(String token) {
         String username = jwtUtil.getUsernameFromToken(token);
+        System.out.println("Extracted Username: " + username);
 
         ParentUserEntity parentUserEntity = parentUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Parent with name " + username + " not found"));
+        System.out.println("Children: " + parentUserEntity.getChildren());
 
         return new ParentUserResponse(parentUserEntity);
     }

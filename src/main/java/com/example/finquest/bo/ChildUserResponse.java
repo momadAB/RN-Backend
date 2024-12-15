@@ -27,5 +27,10 @@ public class ChildUserResponse {
     private boolean isAllowedToMakeTransactionsWithNoPermission;
 
     public ChildUserResponse(ChildUserEntity childUserEntity) {
+        this.id = childUserEntity.getId();
+        this.balance = childUserEntity.getBalance();
+        this.achievementPoints = childUserEntity.getAchievementPoints();
+
     }
+
 }

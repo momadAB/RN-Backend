@@ -40,10 +40,9 @@ public class ParentUserController {
     }
 
     @GetMapping("/get-parent")
-    public ParentUserResponse getParentUser(@RequestHeader("Authorization") String token) {
-        System.out.println(token);
-        System.out.println(parentUserService.getParentUser(token));
-        return parentUserService.getParentUser(token);
+    public ResponseEntity<ParentUserResponse> getParentUser(@RequestHeader("Authorization") String token) {
+        ParentUserResponse response = parentUserService.getParentUser(token);
+        return ResponseEntity.ok(response);  // Automatically serialized to JSON
     }
 
 

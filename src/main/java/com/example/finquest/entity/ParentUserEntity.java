@@ -30,7 +30,7 @@ public class ParentUserEntity {
     @Column(nullable = false)
     private String roles = "ROLE_PARENT";
 
-    @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<ChildUserEntity> children;
 
