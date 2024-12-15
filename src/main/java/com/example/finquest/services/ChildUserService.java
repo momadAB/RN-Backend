@@ -168,30 +168,29 @@ public class ChildUserService {
                 islandMap.put("title", island.getTitle());
                 islandMap.put("logoUrl", island.getLogoUrl());
 
+                // Total lessons in the island
+                int totalLessons = island.getLessons().size();
+
+                // Calculate completed lessons for this island
+                long completedLessonsCount = island.getLessons().stream().filter(l ->
+                        lessonProgressRepository.findByChildUserAndRoadmapLesson(childUserEntity, l)
+                                .map(LessonProgressEntity::getCompleted)
+                                .orElse(false)
+                ).count();
+
+                double completionPercentage = totalLessons > 0 ? ((double) completedLessonsCount / totalLessons) * 100 : 0;
+
+                // Store total lessons, completed lessons, and completion percentage in island map
+                islandMap.put("totalLessons", totalLessons);
+                islandMap.put("completedLessons", completedLessonsCount);
+                islandMap.put("completionPercentage", completionPercentage);
+
                 // Get lessons for this island
                 List<Map<String, Object>> lessons = island.getLessons().stream().map(lesson -> {
                     Map<String, Object> lessonMap = new HashMap<>();
                     lessonMap.put("id", lesson.getId());
                     lessonMap.put("title", lesson.getTitle());
                     lessonMap.put("description", lesson.getDescription());
-
-                    // Get pages for this lesson
-                    List<RoadmapPageEntity> pages = lesson.getPages();
-                    int totalPages = pages.size();
-
-                    // Calculate completed pages for this lesson
-                    long completedPagesCount = pages.stream().filter(page -> {
-                        return lessonProgressRepository.findByChildUserAndRoadmapPage(childUserEntity, page)
-                                .map(progressEntity -> (LessonProgressEntity) progressEntity)
-                                .map(LessonProgressEntity::getCompleted)
-                                .orElse(false);
-                    }).count();
-
-                    double completionPercentage = totalPages > 0 ? ((double) completedPagesCount / totalPages) * 100 : 0;
-
-                    lessonMap.put("totalPages", totalPages);
-                    lessonMap.put("completedPages", completedPagesCount);
-                    lessonMap.put("completionPercentage", completionPercentage);
                     return lessonMap;
                 }).collect(Collectors.toList());
 
@@ -208,6 +207,7 @@ public class ChildUserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
+
     @Transactional
     public ResponseEntity<Map<String, Object>> getLessons(String token, Long islandId) {
         try {
@@ -256,6 +256,41 @@ public class ChildUserService {
             Map<String, Object> response = new HashMap<>();
             response.put("pages", pages);
 
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> completeLesson(String token, Long lessonId) {
+        try {
+            // Get child entity
+            String username = jwtUtil.getUsernameFromToken(token);
+            // Checks if user from token exists
+            ChildUserEntity childUserEntity = childUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+
+            // Get lesson entity
+            RoadmapLessonEntity lessonEntity = roadmapLessonRepository.findById(lessonId)
+                    .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
+
+            // Get or create lesson progress entity
+            LessonProgressEntity lessonProgressEntity = lessonProgressRepository.findByChildUserAndRoadmapLesson(childUserEntity, lessonEntity)
+                    .orElseGet(() -> {
+                        LessonProgressEntity newProgress = new LessonProgressEntity(childUserEntity, lessonEntity);
+                        lessonProgressRepository.save(newProgress); // Save the new progress entity
+                        return newProgress;
+                    });
+
+            // Set completed to true and save the updated progress
+            lessonProgressEntity.setCompleted(true);
+            lessonProgressRepository.save(lessonProgressEntity);
+
+            // Create response
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Lesson completed successfully");
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));

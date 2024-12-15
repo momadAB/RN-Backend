@@ -16,11 +16,20 @@ public class LessonProgressEntity {
     private ChildUserEntity childUser;
 
     @ManyToOne
-    @JoinColumn(name = "roadmap_page_id", nullable = false)
-    private RoadmapPageEntity roadmapPage;
+    @JoinColumn(name = "roadmap_lesson_id", nullable = false)
+    private RoadmapLessonEntity roadmapLesson;
 
     @Column(nullable = false)
     private Boolean isCompleted = false;
+
+    public LessonProgressEntity() {
+    }
+
+    public LessonProgressEntity(ChildUserEntity childUserEntity, RoadmapLessonEntity roadmapLesson) {
+        this.childUser = childUserEntity;
+        this.roadmapLesson = roadmapLesson;
+        this.isCompleted = false;
+    }
 
     public Long getId() {
         return id;
@@ -34,12 +43,12 @@ public class LessonProgressEntity {
         this.childUser = childUser;
     }
 
-    public RoadmapPageEntity getRoadmapPage() {
-        return roadmapPage;
+    public RoadmapLessonEntity getRoadmapLesson() {
+        return roadmapLesson;
     }
 
-    public void setRoadmapPage(RoadmapPageEntity roadmapPage) {
-        this.roadmapPage = roadmapPage;
+    public void setRoadmapLesson(RoadmapLessonEntity roadmapLesson) {
+        this.roadmapLesson = roadmapLesson;
     }
 
     public Boolean getCompleted() {

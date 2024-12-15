@@ -30,12 +30,12 @@ public class ChildUserController {
     }
 
     @PostMapping("/stock-transaction")
-    public ResponseEntity<Map<String, Object>> makeStockTransaction(@RequestBody StockTransactionRequest request, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> makeStockTransaction(@RequestHeader("Authorization") String token, @RequestBody StockTransactionRequest request) {
         return childUserService.makeStockTransaction(request, token);
     }
 
     @PostMapping("/complete-achievement/{achievementId}")
-    public ResponseEntity<Map<String, String>> completeAchievement(@PathVariable Long achievementId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, String>> completeAchievement(@RequestHeader("Authorization") String token, @PathVariable Long achievementId) {
         return achievementService.updateAchievementProgress(achievementId, token);
     }
 
@@ -52,5 +52,10 @@ public class ChildUserController {
     @GetMapping("/get-pages/{lessonId}")
     public ResponseEntity<Map<String, Object>> getPages(@RequestHeader("Authorization") String token, @PathVariable Long lessonId) {
         return childUserService.getPages(token, lessonId);
+    }
+
+    @PostMapping("/complete-lesson/{lessonId}")
+    public ResponseEntity<Map<String, Object>> completeLesson(@RequestHeader("Authorization") String token, @PathVariable Long lessonId) {
+        return childUserService.completeLesson(token, lessonId);
     }
 }
