@@ -21,6 +21,13 @@ public class OwnedStockEntity {
     @Column(nullable = false)
     private Double amount; // Fractional shares are allowed
 
+    @Column
+    private Double stopLoss;
+
+    @Column
+    private Double takeProfit;
+
+
     @ManyToOne
     @JoinColumn(name = "stock_id", nullable = false)
     private StockEntity stock;
@@ -40,6 +47,22 @@ public class OwnedStockEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Double getStopLoss() {
+        return stopLoss;
+    }
+
+    public void setStopLoss(Double stopLoss) {
+        this.stopLoss = stopLoss;
+    }
+
+    public Double getTakeProfit() {
+        return takeProfit;
+    }
+
+    public void setTakeProfit(Double takeProfit) {
+        this.takeProfit = takeProfit;
     }
 
     public ChildUserEntity getChildUser() {

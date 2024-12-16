@@ -77,4 +77,9 @@ public class ChildUserController {
         childUserService.deleteChildById(id);
         return ResponseEntity.ok("Child with ID " + id + " has been deleted successfully.");
     }
+
+    @GetMapping("/get-achievements")
+    public ResponseEntity<Map<String, Object>> getAchievements(@RequestHeader("Authorization") String token) {
+        return childUserService.getAchievements(token);
+    }
 }

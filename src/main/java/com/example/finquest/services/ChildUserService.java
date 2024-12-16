@@ -24,6 +24,7 @@ public class ChildUserService {
     private final ParentUserRepository parentUserRepository;
     private final OwnedStockRepository ownedStockRepository;
     private final AchievementProgressRepository achievementProgressRepository;
+    private final AchievementRepository achievementRepository;
     private final LessonProgressRepository lessonProgressRepository;;
     private final RoadmapIslandRepository roadmapIslandRepository;
     private final RoadmapLessonRepository roadmapLessonRepository;
@@ -37,6 +38,7 @@ public class ChildUserService {
                             ParentUserRepository parentUserRepository,
                             OwnedStockRepository ownedStockRepository,
                             AchievementProgressRepository achievementProgressRepository,
+                            AchievementRepository achievementRepository,
                             LessonProgressRepository lessonProgressRepository,
                             RoadmapIslandRepository roadmapIslandRepository,
                             RoadmapLessonRepository roadmapLessonRepository,
@@ -48,6 +50,7 @@ public class ChildUserService {
         this.parentUserRepository = parentUserRepository;
         this.ownedStockRepository = ownedStockRepository;
         this.achievementProgressRepository = achievementProgressRepository;
+        this.achievementRepository = achievementRepository;
         this.lessonProgressRepository = lessonProgressRepository;
         this.roadmapIslandRepository = roadmapIslandRepository;
         this.roadmapLessonRepository = roadmapLessonRepository;
@@ -73,6 +76,14 @@ public class ChildUserService {
 
     public ResponseEntity<Map<String, Object>> makeStockTransaction(StockTransactionRequest request, String token) {
         try {
+            // Check that request fields are valid
+            if (request == null || request.getCompanyName() == null || request.getCompanyName().trim().isEmpty() ||
+                    request.getAmountChange() == null || request.getAmountChange() < 0 ||
+                    request.getStopLoss() == null || request.getStopLoss() < 0 || request.getStopLoss() > 100 ||
+                    request.getTakeProfit() == null || request.getTakeProfit() < 0 || request.getTakeProfit() > 100) {
+                throw new IllegalArgumentException("Request must have a valid company name, amount change, stop loss, and take profit");
+            }
+
             // Extract child username from token
             String username = jwtUtil.getUsernameFromToken(token);
 
@@ -111,12 +122,15 @@ public class ChildUserService {
                     childUserRepository.save(childUserEntity);
 
                     ownedStockEntity.setAmount(newAmount);
+                    ownedStockEntity.setStopLoss(request.getStopLoss());
+                    ownedStockEntity.setTakeProfit(request.getTakeProfit());
                     ownedStockRepository.save(ownedStockEntity);
 
                     response.put("message", "Stock updated successfully");
                     response.put("stockAmount", ownedStockEntity.getAmount());
                 }
             } else {
+                // Create new owned stock
                 OwnedStockEntity ownedStockEntity = new OwnedStockEntity(childUserEntity, stockEntity, request.getAmountChange());
 
                 if (ownedStockEntity.getAmount() < 0) {
@@ -131,6 +145,9 @@ public class ChildUserService {
                 childUserEntity.setBalance(balance - request.getAmountChange() * stockEntity.getStockPrice());
                 childUserRepository.save(childUserEntity);
 
+                // Set stop loss and take profit
+                ownedStockEntity.setStopLoss(request.getStopLoss());
+                ownedStockEntity.setTakeProfit(request.getTakeProfit());
                 ownedStockRepository.save(ownedStockEntity);
 
                 response.put("message", "Stock added successfully");
@@ -370,4 +387,42 @@ public class ChildUserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    public ResponseEntity<Map<String, Object>> getAchievements(String token) {
+        try {
+            // Get child entity
+            String username = jwtUtil.getUsernameFromToken(token);
+            // Checks if user from token exists
+            childUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+
+            // Get achievements progress
+            List<AchievementProgressEntity> achievements = achievementProgressRepository
+                    .findByChildUser(childUserRepository.findByUsername(username).get());
+
+            // Get all achievements
+            List<AchievementEntity> allAchievements = achievementRepository.findAll();
+
+            // Filter and mark completed achievements, putting completed achievements and uncompleted achievements in separate lists
+            List<AchievementEntity> completedAchievements = new ArrayList<>();
+            List<AchievementEntity> uncompletedAchievements = new ArrayList<>();
+
+            allAchievements.stream().forEach(achievement -> {
+                if (achievements.stream().anyMatch(progress -> progress.getAchievement().getId().equals(achievement.getId()))) {
+                    completedAchievements.add(achievement);
+                } else {
+                    uncompletedAchievements.add(achievement);
+                }
+            });
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("completed", completedAchievements);
+            response.put("uncompleted", uncompletedAchievements);
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
 }
