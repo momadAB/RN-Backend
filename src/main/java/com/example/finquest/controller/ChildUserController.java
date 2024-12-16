@@ -1,5 +1,6 @@
 package com.example.finquest.controller;
 
+import com.example.finquest.bo.ChildUserResponse;
 import com.example.finquest.bo.StockTransactionRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ChildUserEntity;
@@ -57,5 +58,17 @@ public class ChildUserController {
     @PostMapping("/complete-lesson/{lessonId}")
     public ResponseEntity<Map<String, Object>> completeLesson(@RequestHeader("Authorization") String token, @PathVariable Long lessonId) {
         return childUserService.completeLesson(token, lessonId);
+    }
+
+    @GetMapping("/get-child/{id}")
+    public ResponseEntity<ChildUserResponse> getChildUserById(@PathVariable Long id) {
+        ChildUserResponse response = childUserService.getChildUserById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete-child/{id}")
+    public ResponseEntity<String> deleteChildById(@PathVariable Long id) {
+        childUserService.deleteChildById(id);
+        return ResponseEntity.ok("Child with ID " + id + " has been deleted successfully.");
     }
 }

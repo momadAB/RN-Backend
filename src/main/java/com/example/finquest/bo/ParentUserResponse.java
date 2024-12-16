@@ -24,7 +24,6 @@ public class ParentUserResponse {
     @JsonProperty("roles")
     private String roles = "ROLE_PARENT";
 
-    // Optional: Include children if you want to return them
     @JsonProperty("children")
     private List<ChildUserResponse> children;
 
@@ -40,5 +39,6 @@ public class ParentUserResponse {
         }
     }
 
-
+    public ParentUserResponse(Long id, String username) {
+    }
 }
