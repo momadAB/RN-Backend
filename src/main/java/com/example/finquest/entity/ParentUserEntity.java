@@ -25,6 +25,9 @@ public class ParentUserEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column
+    private Double balance = 0.0;
+
     @Column(nullable = false)
     private String password;
 
@@ -46,6 +49,14 @@ public class ParentUserEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
     }
 
     public String getPassword() {

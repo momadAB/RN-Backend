@@ -1,6 +1,7 @@
 package com.example.finquest.services;
 
 import com.example.finquest.bo.ChildTransactionRequest;
+import com.example.finquest.bo.ParentTransactionRequest;
 import com.example.finquest.bo.ParentUserResponse;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ChildUserEntity;
@@ -39,6 +40,33 @@ public class ParentUserService {
         return new ParentUserResponse(parentUserEntity);
     }
 
+    public ResponseEntity<Map<String, Object>> makeTransactionForParent(ParentTransactionRequest request, String token) {
+        try {
+            String username = jwtUtil.getUsernameFromToken(token);
+            Optional<ParentUserEntity> parent = parentUserRepository.findByUsername(username);
+            if (parent.isEmpty()) {
+                throw new IllegalArgumentException("Parent user not found");
+            }
+            if (request.getAmount() == null || request.getAmount() == 0.0) {
+                throw new IllegalArgumentException("Amount cannot be 0 or null");
+            }
+
+            parent.get().setBalance(parent.get().getBalance() + request.getAmount());
+            parentUserRepository.save(parent.get());
+
+            // Create response
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Balance changed successfully");
+            response.put("newBalance", parent.get().getBalance());
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     public ResponseEntity<Map<String, String>> makeTransactionForChild(ChildTransactionRequest request, String token) {
         try {
             String childName = request.getChildName();
@@ -58,6 +86,16 @@ public class ParentUserService {
             if (!childUserEntity.getParentUser().getId().equals(parent.get().getId())) {
                 throw new IllegalArgumentException("Child does not belong to the parent");
             }
+
+            // Check if the parent has enough balance
+            if (parent.get().getBalance() < amount) {
+                throw new IllegalArgumentException("Parent does not have enough balance");
+            }
+
+            // Reduce amount from parents balance
+            parent.get().setBalance(parent.get().getBalance() - amount);
+            parentUserRepository.save(parent.get());
+
             // Add balance
             childUserEntity.setBalance(childUserEntity.getBalance() + amount);
             childUserRepository.save(childUserEntity);
