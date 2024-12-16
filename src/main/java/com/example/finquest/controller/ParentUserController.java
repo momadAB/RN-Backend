@@ -57,7 +57,7 @@ public class ParentUserController {
         return parentUserService.removeChildFromParent(childId, token);
     }
 
-    @PutMapping("/update-transaction-permission/{childId}")
+    @PutMapping("/update-permission/{childId}")
     public ResponseEntity<Map<String, String>> updateTransactionPermission(
             @PathVariable Long childId,
             @RequestBody ApprovalRequest approvalRequest,
