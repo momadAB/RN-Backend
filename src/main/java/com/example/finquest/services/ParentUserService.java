@@ -1,5 +1,6 @@
 package com.example.finquest.services;
 
+import com.example.finquest.bo.ApprovalRequest;
 import com.example.finquest.bo.ChildTransactionRequest;
 import com.example.finquest.bo.ParentTransactionRequest;
 import com.example.finquest.bo.ParentUserResponse;
@@ -136,6 +137,42 @@ public class ParentUserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An error occurred"));
         }
     }
+
+
+    public ResponseEntity<Map<String, String>> updateTransactionPermissionForChild(Long childId, ApprovalRequest approvalRequest, String token) {
+        try {
+            // get parent username from token
+            String username = jwtUtil.getUsernameFromToken(token);
+            Optional<ParentUserEntity> parent = parentUserRepository.findByUsername(username);
+            if (parent.isEmpty()) {
+                throw new IllegalArgumentException("Parent user not found");
+            }
+
+            // find child's id
+            ChildUserEntity childUserEntity = childUserRepository.findById(childId)
+                    .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+
+            // check that child belongs to that parent
+            if (!childUserEntity.getParentUser().getId().equals(parent.get().getId())) {
+                throw new IllegalArgumentException("Child does not belong to the parent");
+            }
+
+            // update the permission status using the request body
+            childUserEntity.setAllowedToMakeTransactionsWithNoPermission(approvalRequest.getIsAllowedToMakeTransactionsWithNoPermission());
+            childUserRepository.save(childUserEntity); // Save the updated child entity
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Permission updated successfully");
+            response.put("new permission status", String.valueOf(childUserEntity.isAllowedToMakeTransactionsWithNoPermission()));
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An error occurred"));
+        }
+    }
+
 
 
 

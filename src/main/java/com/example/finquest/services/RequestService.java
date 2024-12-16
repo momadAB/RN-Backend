@@ -6,7 +6,11 @@ import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.entity.RequestEntity;
 import com.example.finquest.repository.ChildUserRepository;
 import com.example.finquest.repository.RequestRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class RequestService {
@@ -21,21 +25,18 @@ public class RequestService {
 
     public RequestResponse addRequest(RequestRequest requestRequest) {
         ChildUserEntity childUser = childUserRepository.findById(requestRequest.getChildId())
-                .orElseThrow(() -> new IllegalArgumentException("Child with ID " + requestRequest.getChildId() + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("Child with ID " + requestRequest.getChildId() + " not found"));
 
-        RequestEntity requestEntity = new RequestEntity(
-                requestRequest.getChildId(),
-                requestRequest.getDescription(),
-                childUser,
-                requestRequest.getAmount(),
-                requestRequest.getIsRejected(),
-                requestRequest.getIsComplete()
-        );
+        RequestEntity requestEntity = new RequestEntity();
+
+        requestEntity.setChildId(requestRequest.getChildId());
+        requestEntity.setChildUser(childUser);
+        requestEntity.setDescription(requestRequest.getDescription());
+        requestEntity.setIsComplete(requestRequest.getIsComplete());
+        requestEntity.setIsRejected(requestRequest.getIsRejected());
+        requestEntity.setAmount(requestRequest.getAmount());
 
         RequestEntity savedRequest = requestRepository.save(requestEntity);
-
-        // Explicitly print out to confirm getter works
-        System.out.println("Is Complete: " + savedRequest.getIsComplete());
 
         return new RequestResponse(
                 savedRequest.getId(),
@@ -43,10 +44,62 @@ public class RequestService {
                 savedRequest.getDescription(),
                 savedRequest.getAmount(),
                 savedRequest.getIsRejected(),
-                savedRequest.getIsComplete()  // This should now work if Lombok is working properly
+                savedRequest.getIsComplete()
         );
     }
 
+    public RequestResponse getRequestById(Long id) {
+        RequestEntity requestEntity = requestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Request with ID " + id + " not found"));
+        return new RequestResponse(
+                requestEntity.getId(),
+                requestEntity.getChildId(),
+                requestEntity.getDescription(),
+                requestEntity.getAmount(),
+                requestEntity.getIsRejected(),
+                requestEntity.getIsComplete()
+        );
+    }
+
+    public List<RequestEntity> getAllRequests() {
+        return requestRepository.findAll();
+    }
+
+    public ResponseEntity<RequestResponse> updateRequestStatus(Long id, Boolean isComplete, Boolean isRejected) {
+        RequestEntity requestEntity = requestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Request with ID " + id + " not found"));
+
+        try {
+            if(isComplete == null || isRejected == null) {
+                throw new IllegalArgumentException("Arguments cannot be null");
+            }
+
+            requestEntity.setIsComplete(isComplete);
+            requestEntity.setIsRejected(isRejected);
+
+            RequestEntity updatedRequest = requestRepository.save(requestEntity);
+            return ResponseEntity.ok( new RequestResponse(
+                    updatedRequest.getId(),
+                    updatedRequest.getChildId(),
+                    updatedRequest.getDescription(),
+                    updatedRequest.getAmount(),
+                    updatedRequest.getIsRejected(),
+                    updatedRequest.getIsComplete()
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+
+    }
+
+    public void deleteRequestById(Long id) {
+        RequestEntity requestEntity = requestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Request with ID " + id + " not found"));
+        requestRepository.delete(requestEntity);
+    }
 
 
 }

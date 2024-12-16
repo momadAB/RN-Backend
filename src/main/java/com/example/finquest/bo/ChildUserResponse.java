@@ -28,8 +28,6 @@ public class ChildUserResponse {
     private Long avatarId;
     @JsonProperty("roles")
     private String roles = "ROLE_CHILD";
-    @JsonProperty("parentUser")
-    private ParentUserResponse parentUser;
     @JsonProperty("madeRequests")
     private List<RequestEntity> madeRequests;
     @JsonProperty("achievementProgress")
@@ -58,12 +56,7 @@ public class ChildUserResponse {
         this.progressEntities = child.getProgressEntities();
         this.isAllowedToMakeTransactionsWithNoPermission = child.isAllowedToMakeTransactionsWithNoPermission();
 
-        if (child.getParentUser() != null) {
-            this.parentUser = new ParentUserResponse(
-                    child.getParentUser().getId(),
-                    child.getParentUser().getUsername()
-            );
-        }
+
     }
 
 
