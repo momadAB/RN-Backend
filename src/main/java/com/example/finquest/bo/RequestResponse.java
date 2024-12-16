@@ -13,7 +13,7 @@ public class RequestResponse {
     private Boolean isRejected;
     private Boolean isComplete;
 
-
+    public RequestResponse() {}
 
     public RequestResponse(Long id, Long childId, String description, Double amount, Boolean isRejected, Boolean isComplete) {
         this.id = id;
