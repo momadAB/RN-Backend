@@ -424,6 +424,68 @@ public class ChildUserService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
+
     }
+
+    public ResponseEntity<Map<String, Object>> deposit(Long childId, Double amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than zero.");
+        }
+
+        ChildUserEntity childUser = childUserRepository.findById(childId)
+                .orElseThrow(() -> new IllegalArgumentException("Child user not found."));
+
+        Double newBalance = childUser.getBalance() + amount;
+        childUser.setBalance(newBalance);
+        childUserRepository.save(childUser);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Deposit successful");
+        response.put("childId", childId);
+        response.put("newBalance", newBalance);
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<Map<String, Object>> withdraw(Long childId, Double amount) {
+        // Prepare the response map
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (amount == null || amount <= 0) {
+                throw new IllegalArgumentException("Withdrawal amount must be greater than zero.");
+            }
+
+            // Fetch child user
+            ChildUserEntity childUser = childUserRepository.findById(childId)
+                    .orElseThrow(() -> new IllegalArgumentException("Child user not found."));
+
+            // Check balance
+            if (childUser.getBalance() < amount) {
+                throw new IllegalArgumentException("Insufficient balance for withdrawal.");
+            }
+
+            // Deduct balance
+            Double newBalance = childUser.getBalance() - amount;
+            childUser.setBalance(newBalance);
+            childUserRepository.save(childUser);
+
+            // Success response
+            response.put("message", "Withdrawal successful");
+            response.put("childId", childId);
+            response.put("newBalance", newBalance);
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            // Handle IllegalArgumentException with a meaningful response
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+
+        } catch (Exception e) {
+            // Handle unexpected errors
+            response.put("message", "An unexpected error occurred");
+            response.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
 
 }
