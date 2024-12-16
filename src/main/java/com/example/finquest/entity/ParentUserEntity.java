@@ -3,6 +3,7 @@ package com.example.finquest.entity;
 import javax.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,7 @@ public class ParentUserEntity {
 
     @OneToMany(mappedBy = "parentUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
+    @JsonIgnoreProperties(value ={"parentUser"} )
     private List<ChildUserEntity> children;
 
     public Long getId() {
