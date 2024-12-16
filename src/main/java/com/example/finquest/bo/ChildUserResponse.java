@@ -1,6 +1,7 @@
 package com.example.finquest.bo;
 
 import com.example.finquest.entity.*;
+import com.example.finquest.entity.friendship.FriendshipEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class ChildUserResponse {
     @JsonProperty("achievementProgress")
     private List<AchievementProgressEntity> achievementProgress;
     @JsonProperty("friendsList")
-    private List<ChildUserEntity> friendsList;
+    private List<FriendshipEntity> friendsList;
     @JsonProperty("ownedStocks")
     private List<OwnedStockEntity> ownedStocks;
     @JsonProperty("progressEntities")
@@ -52,7 +53,7 @@ public class ChildUserResponse {
         this.roles = child.getRoles();
         this.madeRequests = child.getMadeRequests();
         this.achievementProgress = child.getAchievementProgress();
-        this.friendsList = child.getFriendsList();
+        this.friendsList = child.getFriendships();
         this.ownedStocks = child.getOwnedStocks();
         this.progressEntities = child.getProgressEntities();
         this.isAllowedToMakeTransactionsWithNoPermission = child.isAllowedToMakeTransactionsWithNoPermission();

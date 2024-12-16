@@ -1,4 +1,5 @@
 package com.example.finquest.entity;
+import com.example.finquest.entity.friendship.FriendshipEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -49,13 +50,9 @@ public class ChildUserEntity {
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AchievementProgressEntity> achievementProgress;
 
-    @ManyToMany
-    @JoinTable(
-            name = "child_user_friends",
-            joinColumns = @JoinColumn(name = "child_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id")
-    )
-    private List<ChildUserEntity> friendsList;
+    // Friendships
+    @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<FriendshipEntity> friendships;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OwnedStockEntity> ownedStocks;
@@ -162,12 +159,12 @@ public class ChildUserEntity {
         this.achievementProgress = achievementProgress;
     }
 
-    public List<ChildUserEntity> getFriendsList() {
-        return friendsList;
+    public List<FriendshipEntity> getFriendships() {
+        return friendships;
     }
 
-    public void setFriendsList(List<ChildUserEntity> friendsList) {
-        this.friendsList = friendsList;
+    public void setFriendships(List<FriendshipEntity> friendships) {
+        this.friendships = friendships;
     }
 
     public boolean isAllowedToMakeTransactionsWithNoPermission() {

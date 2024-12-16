@@ -3,10 +3,13 @@ package com.example.finquest.controller;
 import com.example.finquest.bo.ChildUserResponse;
 import com.example.finquest.bo.StockTransactionRequest;
 import com.example.finquest.bo.UpdateProfileRequest;
+import com.example.finquest.bo.friendship.AddFriendRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ChildUserEntity;
+import com.example.finquest.entity.friendship.FriendshipEntity;
 import com.example.finquest.services.AchievementService;
 import com.example.finquest.services.ChildUserService;
+import com.example.finquest.services.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,9 @@ public class ChildUserController {
 
     @Autowired
     private JWTUtil jwtUtil;
+
+    @Autowired
+    private FriendshipService friendshipService;
 
     @GetMapping("/hello")
     public String secureHello() {
@@ -81,5 +87,15 @@ public class ChildUserController {
     @GetMapping("/get-achievements")
     public ResponseEntity<Map<String, Object>> getAchievements(@RequestHeader("Authorization") String token) {
         return childUserService.getAchievements(token);
+    }
+
+    @GetMapping("/get-friends")
+    public ResponseEntity<Map<String, Object>> getFriends(@RequestHeader("Authorization") String token) {
+        return friendshipService.getFriends(token);
+    }
+
+    @PostMapping("/add-friend")
+    public ResponseEntity<Map<String, Object>> addFriend(@RequestHeader("Authorization") String token, @RequestBody AddFriendRequest request) {
+        return friendshipService.addFriend(token, request);
     }
 }
