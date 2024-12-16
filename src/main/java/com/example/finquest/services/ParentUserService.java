@@ -141,27 +141,26 @@ public class ParentUserService {
 
     public ResponseEntity<Map<String, String>> updateTransactionPermissionForChild(Long childId, ApprovalRequest approvalRequest, String token) {
         try {
-            // Get parent username from token
+            // get parent username from token
             String username = jwtUtil.getUsernameFromToken(token);
             Optional<ParentUserEntity> parent = parentUserRepository.findByUsername(username);
             if (parent.isEmpty()) {
                 throw new IllegalArgumentException("Parent user not found");
             }
 
-            // Find the child by ID
+            // find child's id
             ChildUserEntity childUserEntity = childUserRepository.findById(childId)
                     .orElseThrow(() -> new IllegalArgumentException("Child not found"));
 
-            // Ensure the child belongs to the parent
+            // check that child belongs to that parent
             if (!childUserEntity.getParentUser().getId().equals(parent.get().getId())) {
                 throw new IllegalArgumentException("Child does not belong to the parent");
             }
 
-            // Update the permission status using the request body
-            childUserEntity.setAllowedToMakeTransactionsWithNoPermission(approvalRequest.isAllowedToMakeTransactionsWithNoPermission());
+            // update the permission status using the request body
+            childUserEntity.setAllowedToMakeTransactionsWithNoPermission(approvalRequest.getIsAllowedToMakeTransactionsWithNoPermission());
             childUserRepository.save(childUserEntity); // Save the updated child entity
 
-            // Prepare the response
             Map<String, String> response = new HashMap<>();
             response.put("message", "Permission updated successfully");
             response.put("new permission status", String.valueOf(childUserEntity.isAllowedToMakeTransactionsWithNoPermission()));

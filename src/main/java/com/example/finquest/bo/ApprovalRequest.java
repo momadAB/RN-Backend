@@ -3,7 +3,7 @@ package com.example.finquest.bo;
 public class ApprovalRequest {
     private boolean isAllowedToMakeTransactionsWithNoPermission;
 
-    public boolean isAllowedToMakeTransactionsWithNoPermission() {
+    public boolean getIsAllowedToMakeTransactionsWithNoPermission() {
         return isAllowedToMakeTransactionsWithNoPermission;
     }
 
