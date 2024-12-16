@@ -98,4 +98,14 @@ public class ChildUserController {
     public ResponseEntity<Map<String, Object>> addFriend(@RequestHeader("Authorization") String token, @RequestBody AddFriendRequest request) {
         return friendshipService.addFriend(token, request);
     }
+
+    @PutMapping("/{childId}/deposit")
+    public ResponseEntity<Map<String, Object>> deposit(@PathVariable Long childId, @RequestParam Double amount) {
+        return childUserService.deposit(childId, amount);
+    }
+
+    @PutMapping("/{childId}/withdraw")
+    public ResponseEntity<Map<String, Object>> withdraw(@PathVariable Long childId, @RequestParam Double amount) {
+        return childUserService.withdraw(childId, amount);
+    }
 }
