@@ -1,6 +1,7 @@
 package com.example.finquest.controller;
 
 import com.example.finquest.bo.StockTransactionRequest;
+import com.example.finquest.bo.UpdateProfileRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.services.AchievementService;
@@ -57,5 +58,10 @@ public class ChildUserController {
     @PostMapping("/complete-lesson/{lessonId}")
     public ResponseEntity<Map<String, Object>> completeLesson(@RequestHeader("Authorization") String token, @PathVariable Long lessonId) {
         return childUserService.completeLesson(token, lessonId);
+    }
+
+    @PostMapping("/update-profile")
+    public ResponseEntity<Map<String, Object>> updateProfile(@RequestHeader("Authorization") String token, @RequestBody UpdateProfileRequest request) {
+        return childUserService.updateProfile(token, request);
     }
 }

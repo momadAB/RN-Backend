@@ -1,22 +1,17 @@
 package com.example.finquest.bo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-
-@Data
-@Builder
-public class LoginRequest {
+public class UpdateProfileRequest {
+    private Long avatarId;
     private String username;
     private String password;
 
-    public LoginRequest() {
+    // Getters and Setters
+    public Long getAvatarId() {
+        return avatarId;
     }
 
-    public LoginRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
     }
 
     public String getUsername() {

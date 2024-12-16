@@ -1,13 +1,16 @@
 package com.example.finquest.services;
 
 import com.example.finquest.bo.ChildUserResponse;
+import com.example.finquest.bo.LoginRequest;
 import com.example.finquest.bo.StockTransactionRequest;
+import com.example.finquest.bo.UpdateProfileRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.*;
 import com.example.finquest.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,30 +24,39 @@ import java.util.stream.Collectors;
 public class ChildUserService {
 
     private final ChildUserRepository childUserRepository;
+    private final ParentUserRepository parentUserRepository;
     private final OwnedStockRepository ownedStockRepository;
     private final AchievementProgressRepository achievementProgressRepository;
     private final LessonProgressRepository lessonProgressRepository;;
     private final RoadmapIslandRepository roadmapIslandRepository;
     private final RoadmapLessonRepository roadmapLessonRepository;
     private final StockRepository stockRepository;
+    private final AuthService authService;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
 
     @Autowired
     public ChildUserService(ChildUserRepository childUserRepository,
+                            ParentUserRepository parentUserRepository,
                             OwnedStockRepository ownedStockRepository,
                             AchievementProgressRepository achievementProgressRepository,
                             LessonProgressRepository lessonProgressRepository,
                             RoadmapIslandRepository roadmapIslandRepository,
                             RoadmapLessonRepository roadmapLessonRepository,
                             StockRepository stockRepository,
+                            AuthService authService,
+                            BCryptPasswordEncoder passwordEncoder,
                             JWTUtil jwtUtil) {
         this.childUserRepository = childUserRepository;
+        this.parentUserRepository = parentUserRepository;
         this.ownedStockRepository = ownedStockRepository;
         this.achievementProgressRepository = achievementProgressRepository;
         this.lessonProgressRepository = lessonProgressRepository;
         this.roadmapIslandRepository = roadmapIslandRepository;
         this.roadmapLessonRepository = roadmapLessonRepository;
         this.stockRepository = stockRepository;
+        this.authService = authService;
+        this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
@@ -298,4 +310,59 @@ public class ChildUserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
+
+    public ResponseEntity<Map<String, Object>> updateProfile(String token, UpdateProfileRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        // Check that request username is not already taken
+        if (childUserRepository.findByUsername(request.getUsername()).isPresent() || parentUserRepository.findByUsername(request.getUsername()).isPresent()) {
+            response.put("error", "Username already taken");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if the token is missing
+        if (token == null || token.trim().isEmpty()) {
+            response.put("error", "Missing or invalid token");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        // Check if the request is null, empty, or invalid
+        if (request == null || request.getAvatarId() == null || request.getAvatarId() <= 0 ||
+                request.getUsername() == null || request.getUsername().trim().isEmpty() ||
+                request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            response.put("error", "Request must have a valid avatarId, username, and password");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // Fetch child user entity
+        String username = jwtUtil.getUsernameFromToken(token);
+        ChildUserEntity childUserEntity = childUserRepository.findByUsername(username).orElse(null);
+
+        if (childUserEntity == null) {
+            response.put("error", "User not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        // Set up new child entity
+        try {
+            childUserEntity.setAvatarId(request.getAvatarId());
+            childUserEntity.setUsername(request.getUsername());
+            childUserEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+
+            // Save child entity
+            childUserRepository.save(childUserEntity);
+        } catch (Exception e) {
+            response.put("error", "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        response.put("message", "Profile updated successfully");
+
+        // Get new token
+        Map<String, String> newToken = authService.loginUser(new LoginRequest(request.getUsername(), request.getPassword())).getBody();
+        response.put("response", newToken);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
