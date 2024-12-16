@@ -14,10 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,9 +58,17 @@ public class ChildUserService {
     }
 
     public ChildUserResponse getChildUserById(Long id) {
-        ChildUserEntity childUserEntity = childUserRepository.findById(id).orElseThrow(() -> new RuntimeException("Child with ID " + id + " not found"));
-        ChildUserResponse childUserResponse = new ChildUserResponse(childUserEntity);
-        return childUserResponse;
+        ChildUserEntity childUserEntity = childUserRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Child with ID " + id + " not found"));
+
+        return new ChildUserResponse(childUserEntity);
+    }
+
+    public void deleteChildById(Long id) {
+        ChildUserEntity childUserEntity = childUserRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Child with ID " + id + " not found"));
+
+        childUserRepository.delete(childUserEntity);
     }
 
     public ResponseEntity<Map<String, Object>> makeStockTransaction(StockTransactionRequest request, String token) {
