@@ -96,7 +96,7 @@ public class AuthService {
                 // Step 4: Generate JWT token for parent user
                 Map<String, Object> claims = new HashMap<>();
                 claims.put("roles", parentUser.getRoles());
-                String token = jwtUtil.generateToken(parentUser.getUsername(), parentUser.getRoles(), claims);
+                String token = jwtUtil.generateToken(parentUser.getUsername(), parentUser.getRoles(), parentUser.getId(), claims);
                 Map<String, String> response = new HashMap<>();
                 response.put("token", token);
                 response.put("userType", "parent");
@@ -109,7 +109,7 @@ public class AuthService {
                 // Step 4: Generate JWT token for child user
                 Map<String, Object> claims = new HashMap<>();
                 claims.put("roles", childUser.getRoles());
-                String token = jwtUtil.generateToken(childUser.getUsername(), childUser.getRoles(), claims);
+                String token = jwtUtil.generateToken(childUser.getUsername(), childUser.getRoles(), childUser.getId(), claims);
                 Map<String, String> response = new HashMap<>();
                 response.put("token", token);
                 response.put("userType", "child");

@@ -1,6 +1,10 @@
 package com.example.finquest.entity.friendship;
 
 import com.example.finquest.entity.ChildUserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,10 +17,13 @@ public class MessageEntity {
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
+    @JsonBackReference
     private ChatEntity chat;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIgnore
     private ChildUserEntity sender;
 
     @Column(nullable = false)

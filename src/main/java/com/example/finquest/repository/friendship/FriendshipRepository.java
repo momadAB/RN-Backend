@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface FriendshipRepository extends JpaRepository<FriendshipEntity, Long> {
     Object findByChildUser(ChildUserEntity childUserEntity);
 
-    Optional<Object> findByChildUserAndFriendUser(ChildUserEntity childUserEntity, ChildUserEntity childUserEntity1);
+    Optional<FriendshipEntity> findByChildUserAndFriendUser(ChildUserEntity childUserEntity, ChildUserEntity childUserEntity1);
 }

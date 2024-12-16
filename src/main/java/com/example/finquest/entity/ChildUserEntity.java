@@ -2,6 +2,7 @@ package com.example.finquest.entity;
 import com.example.finquest.entity.friendship.FriendshipEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +55,8 @@ public class ChildUserEntity {
 
     // Friendships
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("childUser")
+    @JsonManagedReference
     private List<FriendshipEntity> friendships;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -82,6 +85,8 @@ public class ChildUserEntity {
     public void setProgressEntities(List<LessonProgressEntity> progressEntities) {
         this.progressEntities = progressEntities;
     }
+
+
 
     public Long getId() {
         return id;

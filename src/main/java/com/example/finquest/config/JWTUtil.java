@@ -24,8 +24,9 @@ public class JWTUtil {
      * @param claims Optional additional claims to be included in the token.
      * @return The generated JWT token.
      */
-    public String generateToken(String username, String roles, Map<String, Object> claims) {
+    public String generateToken(String username, String roles, Long id, Map<String, Object> claims) {
         claims.put("roles", roles);
+        claims.put("id", id);
 //        claims.put("userType", userType); // Helps distinguish between Parent and Child users
         return Jwts.builder()
                 .setClaims(claims)

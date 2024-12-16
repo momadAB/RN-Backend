@@ -4,6 +4,7 @@ import com.example.finquest.bo.ChildUserResponse;
 import com.example.finquest.bo.StockTransactionRequest;
 import com.example.finquest.bo.UpdateProfileRequest;
 import com.example.finquest.bo.friendship.AddFriendRequest;
+import com.example.finquest.bo.friendship.SendMessageRequest;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.ChildUserEntity;
 import com.example.finquest.entity.friendship.FriendshipEntity;
@@ -97,5 +98,15 @@ public class ChildUserController {
     @PostMapping("/add-friend")
     public ResponseEntity<Map<String, Object>> addFriend(@RequestHeader("Authorization") String token, @RequestBody AddFriendRequest request) {
         return friendshipService.addFriend(token, request);
+    }
+
+    @GetMapping("/get-chats")
+    public ResponseEntity<Map<String, Object>> getChats(@RequestHeader("Authorization") String token) {
+        return friendshipService.getChats(token);
+    }
+
+    @PostMapping("/send-message")
+    public ResponseEntity<Map<String, Object>> sendMessage(@RequestHeader("Authorization") String token, @RequestBody SendMessageRequest request) {
+        return friendshipService.sendMessage(token, request);
     }
 }
