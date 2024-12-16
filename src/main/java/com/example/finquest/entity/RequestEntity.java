@@ -1,4 +1,6 @@
 package com.example.finquest.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +20,7 @@ public class RequestEntity {
     private Long id;
 
     @Column(nullable = false)
+    @JsonIgnore
     private Long childId;
 
     @Column(nullable = false)
@@ -25,6 +28,7 @@ public class RequestEntity {
 
     @ManyToOne
     @JoinColumn(name = "child_user_id", nullable = false)
+    @JsonIgnore
     private ChildUserEntity childUser;
 
     @Column(nullable = false)
@@ -36,6 +40,7 @@ public class RequestEntity {
     @Column(nullable = false)
     private Boolean isComplete;
 
+    public RequestEntity() {}
 
     public RequestEntity(Long childId, String description, ChildUserEntity childUser, Double amount, Boolean isRejected, Boolean isComplete) {
     }

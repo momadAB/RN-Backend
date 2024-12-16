@@ -27,34 +27,48 @@ public class RequestController {
         return new ResponseEntity<>(requestResponse, HttpStatus.CREATED);
     }
 
-//    // Get a request by ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<RequestResponse> getRequestById(@PathVariable Long id) {
-//        RequestResponse request = requestService.getRequestById(id);
-//        return new ResponseEntity<>(request, HttpStatus.OK);
-//    }
-//
-//    // Update request status
-//    @PatchMapping("/{id}/status")
-//    public ResponseEntity<RequestResponse> updateRequestStatus(
-//            @PathVariable Long id,
-//            @RequestParam Boolean isRejected,
-//            @RequestParam Boolean isComplete) {
-//        RequestResponse updatedRequest = requestService.updateRequestStatus(id, isRejected, isComplete);
-//        return new ResponseEntity<>(updatedRequest, HttpStatus.OK);
-//    }
-//
-//    // Get all requests
-//    @GetMapping
-//    public ResponseEntity<List<RequestResponse>> getAllRequests() {
-//        List<RequestResponse> requests = requestService.getAllRequests();
-//        return new ResponseEntity<>(requests, HttpStatus.OK);
-//    }
-//
-//    // Delete a request by ID
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteRequestById(@PathVariable Long id) {
-//        requestService.deleteRequestById(id);
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    @GetMapping("/get/{id}")
+    public ResponseEntity<RequestResponse> getRequestById(@PathVariable Long id) {
+        RequestResponse requestResponse = requestService.getRequestById(id);
+        return new ResponseEntity<>(requestResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<RequestEntity>> getAllRequests() {
+        List<RequestEntity> requests = requestService.getAllRequests();
+        return new ResponseEntity<>(requests, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteRequestById(@PathVariable Long id) {
+        try {
+            requestService.deleteRequestById(id);
+            String message = "Request with ID " + id + " has been deleted";
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateRequestStatus(
+            @PathVariable Long id,
+            @RequestBody RequestRequest requestRequest) {
+
+        try {
+            // Call the service to update the request status
+            ResponseEntity<RequestResponse> updatedRequest = requestService.updateRequestStatus(
+                    id,
+                    requestRequest.getIsComplete(),
+                    requestRequest.getIsRejected()
+            );
+            return updatedRequest;
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
 }

@@ -44,9 +44,11 @@ public class ChildUserEntity {
     private ParentUserEntity parentUser;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("childUser")
     private List<RequestEntity> madeRequests;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("childUser")
     private List<AchievementProgressEntity> achievementProgress;
 
     @ManyToMany
@@ -58,9 +60,11 @@ public class ChildUserEntity {
     private List<ChildUserEntity> friendsList;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("childUser")
     private List<OwnedStockEntity> ownedStocks;
 
     @OneToMany(mappedBy = "childUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("childUser")
     private List<LessonProgressEntity> progressEntities;
 
     @Column(nullable = false)

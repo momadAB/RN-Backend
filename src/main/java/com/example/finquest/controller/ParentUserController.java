@@ -1,5 +1,6 @@
 package com.example.finquest.controller;
 
+import com.example.finquest.bo.ApprovalRequest;
 import com.example.finquest.bo.ChildTransactionRequest;
 import com.example.finquest.bo.ParentUserResponse;
 import com.example.finquest.bo.RegisterChildUserRequest;
@@ -48,6 +49,14 @@ public class ParentUserController {
     @DeleteMapping("/remove-child/{childId}")
     public ResponseEntity<Map<String, String>> removeChild(@PathVariable Long childId, @RequestHeader("Authorization") String token) {
         return parentUserService.removeChildFromParent(childId, token);
+    }
+
+    @PutMapping("/update-transaction-permission/{childId}")
+    public ResponseEntity<Map<String, String>> updateTransactionPermission(
+            @PathVariable Long childId,
+            @RequestBody ApprovalRequest approvalRequest,
+            @RequestHeader("Authorization") String token) {
+        return parentUserService.updateTransactionPermissionForChild(childId, approvalRequest, token);
     }
 
 
