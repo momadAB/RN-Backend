@@ -23,7 +23,8 @@ public class ParentUserResponse {
     private String username;
     @JsonProperty("roles")
     private String roles = "ROLE_PARENT";
-
+    @JsonProperty("balance")
+    private Double balance;
     @JsonProperty("children")
     private List<ChildUserResponse> children;
 
