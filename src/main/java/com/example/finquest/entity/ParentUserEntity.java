@@ -31,6 +31,9 @@ public class ParentUserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private Long avatarId;
+
     @Column(nullable = false)
     private String roles = "ROLE_PARENT";
 
