@@ -1,5 +1,6 @@
 package com.example.finquest.controller;
 
+import com.example.finquest.bo.AmountRequest;
 import com.example.finquest.bo.ChildUserResponse;
 import com.example.finquest.bo.StockTransactionRequest;
 import com.example.finquest.bo.UpdateProfileRequest;
@@ -107,13 +108,13 @@ public class ChildUserController {
     }
 
     @PutMapping("/{childId}/deposit")
-    public ResponseEntity<Map<String, Object>> deposit(@PathVariable Long childId, @RequestParam Double amount) {
-        return childUserService.deposit(childId, amount);
+    public ResponseEntity<Map<String, Object>> deposit(@PathVariable Long childId, @RequestBody AmountRequest request) {
+        return childUserService.deposit(childId, request);
     }
 
     @PutMapping("/{childId}/withdraw")
-    public ResponseEntity<Map<String, Object>> withdraw(@PathVariable Long childId, @RequestParam Double amount) {
-        return childUserService.withdraw(childId, amount);
+    public ResponseEntity<Map<String, Object>> withdraw(@PathVariable Long childId, @RequestBody AmountRequest request) {
+        return childUserService.withdraw(childId, request);
     }
 
     @GetMapping("/get-chats")
