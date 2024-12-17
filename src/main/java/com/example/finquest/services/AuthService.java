@@ -46,6 +46,7 @@ public class AuthService {
             ParentUserEntity parent = new ParentUserEntity();
             parent.setUsername(request.getUsername());
             parent.setPassword(passwordEncoder.encode(request.getPassword()));
+            parent.setAvatarId(request.getAvatarId());
             parent.setRoles(request.getRoles());
             parentUserRepository.save(parent);
             return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
