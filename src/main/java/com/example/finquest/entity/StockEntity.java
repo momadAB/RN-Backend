@@ -1,4 +1,6 @@
 package com.example.finquest.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class StockEntity {
     private String imageUrl;
 
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<OwnedStockEntity> ownedStocks;
 
     // Getters and Setters

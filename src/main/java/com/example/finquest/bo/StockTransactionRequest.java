@@ -2,7 +2,7 @@ package com.example.finquest.bo;
 
 public class StockTransactionRequest {
     private String companyName;
-    private Double amountChange;
+    private Double amountChangeInCash;
     private Double stopLoss;
     private Double takeProfit;
 
@@ -30,11 +30,11 @@ public class StockTransactionRequest {
         this.companyName = companyName;
     }
 
-    public Double getAmountChange() {
-        return amountChange;
+    public Double getAmountChangeInCash() {
+        return amountChangeInCash;
     }
 
-    public void setAmountChange(Double amountChange) {
-        this.amountChange = amountChange;
+    public void setAmountChangeInCash(Double amountChangeInCash) {
+        this.amountChangeInCash = amountChangeInCash;
     }
 }

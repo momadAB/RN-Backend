@@ -76,88 +76,52 @@ public class ChildUserService {
 
     public ResponseEntity<Map<String, Object>> makeStockTransaction(StockTransactionRequest request, String token) {
         try {
-            // Check that request fields are valid
-            if (request == null || request.getCompanyName() == null || request.getCompanyName().trim().isEmpty() ||
-                    request.getAmountChange() == null || request.getAmountChange() < 0 ||
-                    request.getStopLoss() == null || request.getStopLoss() < 0 || request.getStopLoss() > 100 ||
-                    request.getTakeProfit() == null || request.getTakeProfit() < 0 || request.getTakeProfit() > 100) {
-                throw new IllegalArgumentException("Request must have a valid company name, amount change, stop loss, and take profit");
-            }
+            // Validate input
+            validateStockTransactionRequest(request);
 
-            // Extract child username from token
-            String username = jwtUtil.getUsernameFromToken(token);
+            // Get child and stock
+            ChildUserEntity childUserEntity = getChildUserByUsername(jwtUtil.getUsernameFromToken(token));
+            StockEntity stockEntity = getStockByCompanyName(request.getCompanyName());
 
-            // Check if child user exists
-            ChildUserEntity childUserEntity = childUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
-
-            // Find the stock
-            StockEntity stockEntity = stockRepository.findByCompanyName(request.getCompanyName())
-                    .orElseThrow(() -> new IllegalArgumentException("Stock not found"));
-
-            // Check if child owns the stock
+            // Create or update owned stock
             Optional<OwnedStockEntity> ownedStock = ownedStockRepository.findByChildUserAndStock(childUserEntity, stockEntity);
-
-            // Create response
             Map<String, Object> response = new HashMap<>();
 
             if (ownedStock.isPresent()) {
-                OwnedStockEntity ownedStockEntity = ownedStock.get();
-                Double newAmount = ownedStockEntity.getAmount() + request.getAmountChange();
-
-                if (newAmount < 0) {
-                    throw new IllegalArgumentException("Stock amount cannot be negative");
-                }
-
-                if (newAmount == 0) {
-                    ownedStockRepository.delete(ownedStockEntity);
-                    response.put("message", "Stock deleted successfully");
-                } else {
-                    Double balance = childUserEntity.getBalance() != null ? childUserEntity.getBalance() : 0.0;
-                    if (balance < request.getAmountChange() * stockEntity.getStockPrice()) {
-                        throw new IllegalArgumentException("Insufficient balance for this transaction");
-                    }
-
-                    childUserEntity.setBalance(balance - (request.getAmountChange() * stockEntity.getStockPrice()));
-                    childUserRepository.save(childUserEntity);
-
-                    ownedStockEntity.setAmount(newAmount);
-                    ownedStockEntity.setStopLoss(request.getStopLoss());
-                    ownedStockEntity.setTakeProfit(request.getTakeProfit());
-                    ownedStockRepository.save(ownedStockEntity);
-
-                    response.put("message", "Stock updated successfully");
-                    response.put("stockAmount", ownedStockEntity.getAmount());
-                }
+                updateOwnedStock(ownedStock.get(), request, childUserEntity, stockEntity);
+                response.put("message", "Stock updated successfully");
             } else {
-                // Create new owned stock
-                OwnedStockEntity ownedStockEntity = new OwnedStockEntity(childUserEntity, stockEntity, request.getAmountChange());
-
-                if (ownedStockEntity.getAmount() < 0) {
-                    throw new IllegalArgumentException("Stock amount cannot be negative");
-                }
-
-                Double balance = childUserEntity.getBalance() != null ? childUserEntity.getBalance() : 0.0;
-                if (balance < request.getAmountChange() * stockEntity.getStockPrice()) {
-                    throw new IllegalArgumentException("Insufficient balance for this transaction");
-                }
-
-                childUserEntity.setBalance(balance - request.getAmountChange() * stockEntity.getStockPrice());
-                childUserRepository.save(childUserEntity);
-
-                // Set stop loss and take profit
-                ownedStockEntity.setStopLoss(request.getStopLoss());
-                ownedStockEntity.setTakeProfit(request.getTakeProfit());
-                ownedStockRepository.save(ownedStockEntity);
-
+                createOwnedStock(childUserEntity, request, stockEntity);
                 response.put("message", "Stock added successfully");
-                response.put("stockAmount", ownedStockEntity.getAmount());
             }
 
+            // Create response
             response.put("childUsername", childUserEntity.getUsername());
             response.put("newBalance", childUserEntity.getBalance());
             response.put("companyName", stockEntity.getCompanyName());
 
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> getStocks(String token) {
+        try {
+            // Get child entity
+            String username = jwtUtil.getUsernameFromToken(token);
+            // Checks if user from token exists
+            childUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+
+            // Get all owned stocks
+            List<OwnedStockEntity> ownedStocks = childUserRepository.findByUsername(username).get().getOwnedStocks();
+
+            // Create response
+            Map<String, Object> response = new HashMap<>();
+            response.put("ownedStocks", ownedStocks);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -487,5 +451,82 @@ public class ChildUserService {
         }
     }
 
+    // Helper functions
+
+    private void validateStockTransactionRequest(StockTransactionRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+        if (request.getCompanyName() == null || request.getCompanyName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Company name must be provided");
+        }
+        if (request.getStopLoss() == null || request.getStopLoss() < 0 || request.getStopLoss() > 100) {
+            throw new IllegalArgumentException("Stop loss must be between 0 and 100");
+        }
+        if (request.getTakeProfit() == null || request.getTakeProfit() < 0 || request.getTakeProfit() > 100) {
+            throw new IllegalArgumentException("Take profit must be between 0 and 100");
+        }
+    }
+
+    private void ensureNonNegative(Double value, String fieldName) {
+        if (value == null || value < 0) {
+            throw new IllegalArgumentException(fieldName + " must be non-negative");
+        }
+    }
+
+    private void checkSufficientBalance(ChildUserEntity childUserEntity, Double requiredAmount) {
+        Double balance = childUserEntity.getBalance() != null ? childUserEntity.getBalance() : 0.0;
+        if (balance < requiredAmount) {
+            throw new IllegalArgumentException("Insufficient balance for this transaction");
+        }
+    }
+
+    @Transactional
+    private void updateOwnedStock(OwnedStockEntity ownedStockEntity, StockTransactionRequest request, ChildUserEntity childUserEntity, StockEntity stockEntity) {
+        Double newAmount = ownedStockEntity.getAmount() + request.getAmountChangeInCash();
+        ensureNonNegative(newAmount, "Stock amount");
+
+        if (newAmount == 0) {
+            ownedStockRepository.delete(ownedStockEntity);
+        } else {
+            checkSufficientBalance(childUserEntity, request.getAmountChangeInCash());
+            // Deduct from child user
+            Double newBalance = childUserEntity.getBalance() - request.getAmountChangeInCash();
+            childUserEntity.setBalance(newBalance);
+            childUserRepository.save(childUserEntity);
+
+            ownedStockEntity.setAmount(newAmount);
+            ownedStockEntity.setAmountOfStocks(request.getAmountChangeInCash() / stockEntity.getStockPrice());
+            ownedStockEntity.setStopLoss(request.getStopLoss());
+            ownedStockEntity.setTakeProfit(request.getTakeProfit());
+            ownedStockRepository.save(ownedStockEntity);
+        }
+    }
+
+    @Transactional
+    private void createOwnedStock(ChildUserEntity childUserEntity, StockTransactionRequest request, StockEntity stockEntity) {
+        OwnedStockEntity ownedStockEntity = new OwnedStockEntity(childUserEntity, stockEntity, request.getAmountChangeInCash(), request.getAmountChangeInCash() / stockEntity.getStockPrice());
+        ensureNonNegative(ownedStockEntity.getAmount(), "Stock amount");
+
+        checkSufficientBalance(childUserEntity, request.getAmountChangeInCash());
+        // Deduct from child user
+        Double newBalance = childUserEntity.getBalance() - request.getAmountChangeInCash();
+        childUserEntity.setBalance(newBalance);
+        childUserRepository.save(childUserEntity);
+
+        ownedStockEntity.setStopLoss(request.getStopLoss());
+        ownedStockEntity.setTakeProfit(request.getTakeProfit());
+        ownedStockRepository.save(ownedStockEntity);
+    }
+
+    private ChildUserEntity getChildUserByUsername(String username) {
+        return childUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+    }
+
+    private StockEntity getStockByCompanyName(String companyName) {
+        return stockRepository.findByCompanyName(companyName)
+                .orElseThrow(() -> new IllegalArgumentException("Stock not found"));
+    }
 
 }
