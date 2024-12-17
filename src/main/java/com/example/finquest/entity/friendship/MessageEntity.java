@@ -1,10 +1,8 @@
 package com.example.finquest.entity.friendship;
 
 import com.example.finquest.entity.ChildUserEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.example.finquest.view.Views;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -22,14 +20,15 @@ public class MessageEntity {
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIgnore
+    @JsonView(Views.IdOnly.class)
     private ChildUserEntity sender;
 
     @Column(nullable = false)
+    @JsonView(Views.IdOnly.class)
     private String content;
 
     @Column(nullable = false)
+    @JsonView(Views.IdOnly.class)
     private Date sentAt = new Date();
 
     public Long getId() {

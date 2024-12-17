@@ -1,13 +1,13 @@
 package com.example.finquest.entity;
 import com.example.finquest.entity.friendship.FriendshipEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.example.finquest.view.Views;
+import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 import java.util.List;
 
@@ -19,6 +19,7 @@ import java.util.List;
 public class ChildUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.IdOnly.class)
     private Long id;
 
     @Column(nullable = false)
@@ -31,6 +32,7 @@ public class ChildUserEntity {
     private String username;
 
     @Column(nullable = false, length = 200)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)

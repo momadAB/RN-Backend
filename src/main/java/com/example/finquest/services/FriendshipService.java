@@ -11,9 +11,11 @@ import com.example.finquest.repository.ChildUserRepository;
 import com.example.finquest.repository.friendship.ChatRepository;
 import com.example.finquest.repository.friendship.FriendshipRepository;
 import com.example.finquest.repository.friendship.MessageRepository;
+import com.example.finquest.view.Views;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -122,19 +124,25 @@ public class FriendshipService {
         return ResponseEntity.ok(Map.of("message", "Message sent successfully!"));
     }
 
-    public ResponseEntity<Map<String, Object>> getChats(String token) {
+    public MappingJacksonValue getChats(String token) {
         // Get child user from token
         String username = jwtUtil.getUsernameFromToken(token);
         Optional<ChildUserEntity> childUserOpt = childUserRepository.findByUsername(username);
         if (childUserOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid token: User not found"));
+            throw new IllegalArgumentException("Invalid token: User not found");
         }
         ChildUserEntity childUser = childUserOpt.get();
 
         // Get all chats for the child user
         List<ChatEntity> chats = chatRepository.findByChildUser(childUser);
 
-        return ResponseEntity.ok(Map.of("chats", chats));
+        // Create a map to wrap the response
+        Map<String, Object> response = Map.of("chats", chats);
+
+        // Wrap the map in MappingJacksonValue
+        MappingJacksonValue mapping = new MappingJacksonValue(response);
+        mapping.setSerializationView(Views.IdOnly.class); // Use the Views.IdOnly view
+        return mapping;
     }
 
 }

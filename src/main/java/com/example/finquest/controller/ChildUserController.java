@@ -13,6 +13,7 @@ import com.example.finquest.services.ChildUserService;
 import com.example.finquest.services.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -116,7 +117,7 @@ public class ChildUserController {
     }
 
     @GetMapping("/get-chats")
-    public ResponseEntity<Map<String, Object>> getChats(@RequestHeader("Authorization") String token) {
+    public MappingJacksonValue getChats(@RequestHeader("Authorization") String token) {
         return friendshipService.getChats(token);
     }
 
