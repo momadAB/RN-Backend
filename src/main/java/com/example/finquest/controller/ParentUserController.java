@@ -49,7 +49,7 @@ public class ParentUserController {
     @GetMapping("/get-parent")
     public ResponseEntity<ParentUserResponse> getParentUser(@RequestHeader("Authorization") String token) {
         ParentUserResponse response = parentUserService.getParentUser(token);
-        return ResponseEntity.ok(response);  // Automatically serialized to JSON
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/remove-child/{childId}")

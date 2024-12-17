@@ -32,7 +32,11 @@ public class ParentUserResponse {
         this.id = parentUserEntity.getId();
         this.username = parentUserEntity.getUsername();
         this.roles = parentUserEntity.getRoles();
-
+        if (parentUserEntity.getBalance() == null) {
+            this.balance = 0.0;
+        } else {
+            this.balance = parentUserEntity.getBalance();
+        }
         if (parentUserEntity.getChildren() != null) {
             this.children = parentUserEntity.getChildren().stream()
                     .map(child -> new ChildUserResponse(child))
