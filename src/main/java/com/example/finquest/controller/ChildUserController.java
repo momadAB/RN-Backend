@@ -117,12 +117,12 @@ public class ChildUserController {
         return friendshipService.addFriend(token, request);
     }
 
-    @PutMapping("/deposit/{childId}")
+    @PutMapping("/{childId}/deposit")
     public ResponseEntity<Map<String, Object>> deposit(@PathVariable Long childId, @RequestBody AmountRequest request) {
         return childUserService.deposit(childId, request);
     }
 
-    @PutMapping("/withdraw/{childId}")
+    @PutMapping("/{childId}/withdraw")
     public ResponseEntity<Map<String, Object>> withdraw(@PathVariable Long childId, @RequestBody AmountRequest request) {
         return childUserService.withdraw(childId, request);
     }
