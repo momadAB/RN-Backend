@@ -4,9 +4,11 @@ import com.example.finquest.bo.*;
 import com.example.finquest.config.JWTUtil;
 import com.example.finquest.entity.*;
 import com.example.finquest.repository.*;
+import com.example.finquest.view.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -147,6 +149,25 @@ public class ChildUserService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
+    }
+
+    public MappingJacksonValue getAvailableIslands(String token) {
+        // Get child entity
+        String username = jwtUtil.getUsernameFromToken(token);
+        // Checks if user from token exists
+        childUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+
+        // Get all islands
+        List<RoadmapIslandEntity> availableIslands = roadmapIslandRepository.findAll();
+
+        // Create response
+        Map<String, Object> response = new HashMap<>();
+        response.put("availableIslands", availableIslands);
+
+        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(response);
+        mappingJacksonValue.setSerializationView(Views.NameOnly.class);
+        return mappingJacksonValue;
     }
 
     public ResponseEntity<Map<String, Object>> getProgress(String token) {

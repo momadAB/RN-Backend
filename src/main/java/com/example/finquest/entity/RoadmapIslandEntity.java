@@ -1,5 +1,7 @@
 package com.example.finquest.entity;
+import com.example.finquest.view.Views;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,12 +19,14 @@ public class RoadmapIslandEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.NameOnly.class)
     private Long id;
 
     @Column(nullable = false)
     private String logoUrl;
 
     @Column(nullable = false)
+    @JsonView(Views.NameOnly.class)
     private String title;
 
     @OneToMany(mappedBy = "island", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

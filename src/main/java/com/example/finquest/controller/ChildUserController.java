@@ -65,6 +65,11 @@ public class ChildUserController {
         return childUserService.getProgress(token);
     }
 
+    @GetMapping("/get-islands")
+    public MappingJacksonValue getIslands(@RequestHeader("Authorization") String token) {
+        return childUserService.getAvailableIslands(token);
+    }
+
     @GetMapping("/get-lessons/{islandId}")
     public ResponseEntity<Map<String, Object>> getLessons(@RequestHeader("Authorization") String token, @PathVariable Long islandId) {
         return childUserService.getLessons(token, islandId);
