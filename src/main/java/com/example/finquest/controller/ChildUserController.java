@@ -50,6 +50,11 @@ public class ChildUserController {
         return childUserService.getStocks(token);
     }
 
+    @GetMapping("/get-available-stocks")
+    public ResponseEntity<Map<String, Object>> getAvailableStocks(@RequestHeader("Authorization") String token) {
+        return childUserService.getAvailableStocks(token);
+    }
+
     @PostMapping("/complete-achievement/{achievementId}")
     public ResponseEntity<Map<String, String>> completeAchievement(@RequestHeader("Authorization") String token, @PathVariable Long achievementId) {
         return achievementService.updateAchievementProgress(achievementId, token);

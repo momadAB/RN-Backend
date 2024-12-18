@@ -127,6 +127,28 @@ public class ChildUserService {
         }
     }
 
+    public ResponseEntity<Map<String, Object>> getAvailableStocks(String token) {
+        try {
+            // Get child entity
+            String username = jwtUtil.getUsernameFromToken(token);
+            // Checks if user from token exists
+            childUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Child user not found"));
+
+            // Get all stocks
+            List<StockEntity> availableStocks = stockRepository.findAll();
+
+            // Create response
+            Map<String, Object> response = new HashMap<>();
+            response.put("availableStocks", availableStocks);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     public ResponseEntity<Map<String, Object>> getProgress(String token) {
         try {
             // Get child entity
