@@ -183,6 +183,7 @@ public class ChildUserService {
             // Create response
             Map<String, Object> response = new HashMap<>();
             response.put("childUsername", childUserEntity.getUsername());
+            response.put("avatarId", childUserEntity.getAvatarId());
             response.put("balance", childUserEntity.getBalance());
 
             List<Map<String, Object>> achievements = progressEntities.stream().map(progressEntity -> {
