@@ -531,7 +531,7 @@ public class ChildUserService {
             childUserRepository.save(childUserEntity);
 
             ownedStockEntity.setAmount(newAmount);
-            ownedStockEntity.setAmountOfStocks(request.getAmountChangeInCash() / stockEntity.getStockPrice());
+            ownedStockEntity.setAmountOfStocks(ownedStockEntity.getAmount() / stockEntity.getStockPrice());
             ownedStockEntity.setStopLoss(request.getStopLoss());
             ownedStockEntity.setTakeProfit(request.getTakeProfit());
             ownedStockRepository.save(ownedStockEntity);
