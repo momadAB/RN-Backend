@@ -11,6 +11,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ParentUserRequest {
     private Long id;
+    private Long avatarId;
+
+    public Long getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
+    }
 
     public Long getId() {
         return id;

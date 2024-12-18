@@ -5,6 +5,15 @@ public class RegisterParentUserRequest {
     private String username;
     private String password;
     private String roles = "ROLE_PARENT";
+    private Long avatarId;
+
+    public Long getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
+    }
 
     public String getUsername() {
         return username;

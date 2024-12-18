@@ -21,6 +21,8 @@ public class ParentUserResponse {
     private Long id;
     @JsonProperty("username")
     private String username;
+    @JsonProperty("avatarId")
+    private Long avatarId;
     @JsonProperty("roles")
     private String roles = "ROLE_PARENT";
     @JsonProperty("balance")
@@ -31,6 +33,7 @@ public class ParentUserResponse {
     public ParentUserResponse(ParentUserEntity parentUserEntity) {
         this.id = parentUserEntity.getId();
         this.username = parentUserEntity.getUsername();
+        this.avatarId = parentUserEntity.getAvatarId();
         this.roles = parentUserEntity.getRoles();
         if (parentUserEntity.getBalance() == null) {
             this.balance = 0.0;

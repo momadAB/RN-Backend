@@ -31,6 +31,9 @@ public class ParentUserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private Long avatarId;
+
     @Column(nullable = false)
     private String roles = "ROLE_PARENT";
 
@@ -81,5 +84,13 @@ public class ParentUserEntity {
 
     public void setChildren(List<ChildUserEntity> children) {
         this.children = children;
+    }
+
+    public Long getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
     }
 }
