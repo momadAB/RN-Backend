@@ -14,14 +14,17 @@ import com.example.finquest.repository.friendship.MessageRepository;
 import com.example.finquest.view.Views;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendshipService {
@@ -70,14 +73,38 @@ public class FriendshipService {
     }
 
     public ResponseEntity<Map<String, Object>> getFriends(String token) {
-        // Get child from token
+        // Extract username from the token
         String username = jwtUtil.getUsernameFromToken(token);
-        Optional<ChildUserEntity> childUser = childUserRepository.findByUsername(username);
 
-        // Return usernames of friends
-        List<FriendshipEntity> friendshipEntityList = childUser.get().getFriendships();
+        // Find the child user from the repository
+        Optional<ChildUserEntity> childUserOptional = childUserRepository.findByUsername(username);
 
-        return ResponseEntity.ok(Map.of("friends", friendshipEntityList.stream().map(FriendshipEntity::getFriendUser).map(ChildUserEntity::getUsername).toList()));
+        // Check if the child user exists
+        if (childUserOptional.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Child user not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        ChildUserEntity childUser = childUserOptional.get();
+
+        // Get list of friends from the FriendshipEntity
+        List<Map<String, Object>> friends = childUser.getFriendships().stream()
+                .map(friendship -> {
+                    ChildUserEntity friend = friendship.getFriendUser();
+                    Map<String, Object> friendData = new HashMap<>();
+                    friendData.put("id", friend.getId());
+                    friendData.put("username", friend.getUsername());
+                    friendData.put("avatarId", friend.getAvatarId());
+                    return friendData;
+                })
+                .collect(Collectors.toList());
+
+        // Build the response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("friends", friends);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Transactional
@@ -97,8 +124,8 @@ public class FriendshipService {
         }
         ChildUserEntity friendUser = friendOpt.get();
 
-        // Check if chat already exists between the two users
-        Optional<ChatEntity> chatOpt = chatRepository.findByChildUserAndFriendUser(childUser, friendUser);
+        // Check if chat already exists between the two users (bi-directional lookup)
+        Optional<ChatEntity> chatOpt = chatRepository.findByUsers(childUser, friendUser);
         ChatEntity chat;
         if (chatOpt.isPresent()) {
             chat = chatOpt.get();
@@ -108,6 +135,12 @@ public class FriendshipService {
             chat.setChildUser(childUser);
             chat.setFriendUser(friendUser);
             chat = chatRepository.save(chat);
+
+            // Also create the inverse chat for the friend to see it in their chat list
+            ChatEntity inverseChat = new ChatEntity();
+            inverseChat.setChildUser(friendUser);
+            inverseChat.setFriendUser(childUser);
+            chatRepository.save(inverseChat);
         }
 
         // Create a new message
@@ -133,8 +166,8 @@ public class FriendshipService {
         }
         ChildUserEntity childUser = childUserOpt.get();
 
-        // Get all chats for the child user
-        List<ChatEntity> chats = chatRepository.findByChildUser(childUser);
+        // Get all chats where the user is either childUser or friendUser
+        List<ChatEntity> chats = chatRepository.findByUser(childUser);
 
         // Create a map to wrap the response
         Map<String, Object> response = Map.of("chats", chats);
@@ -144,5 +177,6 @@ public class FriendshipService {
         mapping.setSerializationView(Views.IdOnly.class); // Use the Views.IdOnly view
         return mapping;
     }
+
 
 }
